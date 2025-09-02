@@ -1,3 +1,5 @@
+package org.example.motogp.enums
+
 /**
  * @enum FabricanteMoto
  * @brief Representa los fabricantes de motos.

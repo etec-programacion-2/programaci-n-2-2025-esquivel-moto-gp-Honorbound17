@@ -1,5 +1,4 @@
-#pragma once
-#include "Nacionalidad.h"
+package org.example.motogp.enums
 
 /**
  * @enum Nacionalidad

@@ -1,3 +1,4 @@
+package org.example.motogp.enums  // para enums
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
@@ -13,6 +14,7 @@ import kotlin.random.Random
  * - C: Promedio (top 60%) 
  * - D: Novato (resto)
  */
+
 enum class RangoHabilidad(val multiplicadorMin: Double, val multiplicadorMax: Double) {
     S(3.0, 300.0),   // Élite: multiplica habilidades base por 3.0-300.0
     A(2.0, 200.0),   // Excelente: multiplica por 2.0-200.0
