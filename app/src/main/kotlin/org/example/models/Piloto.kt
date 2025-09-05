@@ -1,6 +1,7 @@
 package org.example.motogp.models
 
 import org.example.motogp.enums.Nacionalidad
+import org.example.motogp.enums.RangoHabilidad
 import kotlin.math.max
 import kotlin.math.min
 

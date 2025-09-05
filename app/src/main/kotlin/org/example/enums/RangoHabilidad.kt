@@ -1,4 +1,4 @@
-package org.example.motogp.enums  // para enums
+package org.example.motogp.enums
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
