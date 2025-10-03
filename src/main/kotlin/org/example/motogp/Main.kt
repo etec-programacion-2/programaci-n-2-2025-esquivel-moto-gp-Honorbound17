@@ -53,3 +53,39 @@ fun Double.format(digits: Int) = "% .${digits}f".format(this)
 
 // Función de extensión para repetir strings (útil para separadores)
 operator fun String.times(n: Int) = this.repeat(n)
+
+fun demoEquipos() {
+    println("\n🏁 DEMO DE EQUIPOS MOTOGP")
+    println("=" * 40)
+    
+    // Crear equipos
+    val ducati = crearEquipoDucatiLenovo()
+    val honda = crearEquipoRepsolHonda()
+    val yamaha = crearEquipoYamaha()
+    
+    // Crear pilotos
+    val bagnaia = crearPilotoElite("Francesco Bagnaia", Nacionalidad.ITALIA, 26)
+    val bastianini = crearPilotoExcelente("Enea Bastianini", Nacionalidad.ITALIA, 25)
+    val marquez = crearPilotoElite("Marc Márquez", Nacionalidad.ESPANA, 30)
+    val quartararo = crearPilotoExcelente("Fabio Quartararo", Nacionalidad.FRANCIA, 24)
+    
+    // Fichar pilotos
+    ducati.ficharPiloto(bagnaia)
+    ducati.ficharPiloto(bastianini)
+    honda.ficharPiloto(marquez)
+    yamaha.ficharPiloto(quartararo)
+    
+    // Mostrar información de equipos
+    listOf(ducati, honda, yamaha).forEach { equipo ->
+        println(equipo.descripcion())
+        println()
+    }
+}
+
+// Llamar a la demo desde main()
+fun main() {
+    println("🏍️ SIMULADOR DE MOTOGP 🏁")
+    println("=" * 30)
+    
+    demoEquipos()
+}
