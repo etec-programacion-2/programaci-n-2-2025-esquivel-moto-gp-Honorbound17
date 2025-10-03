@@ -7,6 +7,8 @@ import org.example.motogp.models.Habilidades
 import org.example.motogp.models.Moto
 import org.example.motogp.models.Piloto
 import org.example.motogp.models.Rendimiento
+import org.example.motogp.simulacion.SimuladorCarrera
+import org.example.motogp.simulacion.ResultadoCarrera
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertEquals
@@ -157,5 +159,51 @@ class AppTest {
         assertEquals(0, equipo.numeroPilotos())
         assertFalse(equipo.estaCompleto())
         assertNull(equipo.obtenerPilotoPrincipal())
+    }
+
+    @Test fun testResultadoCarrera() {
+        val piloto1 = crearPilotoElite("Piloto 1", Nacionalidad.ESPANA, 25)
+        val piloto2 = crearPilotoExcelente("Piloto 2", Nacionalidad.ITALIA, 26)
+        val piloto3 = crearPilotoBueno("Piloto 3", Nacionalidad.FRANCIA, 27)
+    
+        val resultado = ResultadoCarrera(
+            posiciones = listOf(piloto1, piloto2, piloto3),
+            vueltasRapidas = mapOf(piloto1 to 89.456),
+            abandonos = emptyList()
+        )
+    
+        assertEquals(piloto1, resultado.obtenerGanador())
+        assertEquals(3, resultado.obtenerPodio().size)
+        assertEquals(1, resultado.obtenerPosicion(piloto1))
+        assertTrue(resultado.pilotoEnPuntos(piloto1))
+    }
+
+    @Test fun testCircuitoCreacion() {
+        val circuito = CIRCUITO_JEREZ
+    
+        assertNotNull(circuito)
+        assertEquals("Circuito de Jerez-Ángel Nieto", circuito.nombre)
+        assertEquals(Nacionalidad.ESPANA, circuito.pais)
+        assertTrue(circuito.dificultad in 1..100)
+    }
+
+    // Test Mock para demostrar el uso de la interfaz
+    class SimuladorMock : SimuladorCarrera {
+        override fun simular(pilotos: List<Piloto>, circuito: Circuito): ResultadoCarrera {
+            return ResultadoCarrera(posiciones = pilotos.reversed())
+        }
+    }
+
+    @Test fun testInterfazSimulador() {
+        val simuladorMock = SimuladorMock()
+        val pilotos = listOf(
+            crearPilotoElite("Piloto A", Nacionalidad.ESPANA, 25),
+            crearPilotoExcelente("Piloto B", Nacionalidad.ITALIA, 26)
+        )
+    
+        val resultado = simuladorMock.simular(pilotos, CIRCUITO_MUGELO)
+    
+        assertEquals(2, resultado.posiciones.size)
+        assertEquals("Piloto B", resultado.obtenerGanador().nombre)
     }
 }

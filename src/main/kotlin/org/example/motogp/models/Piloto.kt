@@ -17,6 +17,7 @@ data class Piloto(
     val nacionalidad: Nacionalidad,
     val edad: Int,
     val habilidades: Habilidades
+    val equipo: Equipo? = null
 ) {
     init {
         require(nombre.isNotBlank()) { "El nombre no puede estar vacío" }
