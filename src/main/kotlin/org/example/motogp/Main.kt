@@ -82,6 +82,80 @@ fun demoEquipos() {
     }
 }
 
+fun demoSIMULADOR() {
+    println("\n🎮 DEMO DEL SIMULADOR DE CARRERAS")
+    println("=" * 45)
+    
+    val simulador = SimuladorCarreraSimple()
+    
+    // Crear equipos y pilotos
+    val ducati = crearEquipoDucatiLenovo()
+    val honda = crearEquipoRepsolHonda()
+    val yamaha = crearEquipoYamaha()
+    
+    val bagnaia = crearPilotoElite("Francesco Bagnaia", Nacionalidad.ITALIA, 26).apply {
+        ducati.ficharPiloto(this)
+    }
+    val bastianini = crearPilotoExcelente("Enea Bastianini", Nacionalidad.ITALIA, 25).apply {
+        ducati.ficharPiloto(this)
+    }
+    val marquez = crearPilotoElite("Marc Márquez", Nacionalidad.ESPANA, 30).apply {
+        honda.ficharPiloto(this)
+    }
+    val quartararo = crearPilotoExcelente("Fabio Quartararo", Nacionalidad.FRANCIA, 24).apply {
+        yamaha.ficharPiloto(this)
+    }
+    
+    val pilotos = listOf(bagnaia, bastianini, marquez, quartararo)
+    
+    // Simular carreras en diferentes circuitos
+    val circuitos = listOf(
+        CIRCUITO_JEREZ to "Jerez",
+        CIRCUITO_MUGELO to "Mugello", 
+        CIRCUITO_ASSEN to "Assen"
+    )
+    
+    circuitos.forEach { (circuito, nombre) ->
+        println("\n🏁 CARRERA EN: ${circuito.nombre}")
+        println("📏 ${circuito.descripcion()}")
+        
+        val resultado = simulador.simular(pilotos, circuito)
+        println(resultado.resumen())
+        
+        // Mostrar puntuación del campeonato simplificada
+        println("\n📊 PUNTUACIONES:")
+        resultado.posiciones.forEachIndexed { index, piloto ->
+            val puntos = when (index) {
+                0 -> 25
+                1 -> 20
+                2 -> 16
+                3 -> 13
+                4 -> 11
+                else -> 0
+            }
+            println("${index + 1}. ${piloto.nombre} - $puntos pts")
+        }
+    }
+    
+    // Demo de simulación con pesos personalizados
+    println("\n⚖️  SIMULACIÓN CON PESOS PERSONALIZADOS (70% habilidades, 30% moto)")
+    val resultadoPersonalizado = simulador.simularConPesos(
+        pilotos = pilotos,
+        circuito = CIRCUITO_SILVERSTONE,
+        pesoHabilidades = 0.7,
+        pesoMoto = 0.3
+    )
+    println(resultadoPersonalizado.resumen())
+}
+
+// Actualizar la función main para incluir la demo del simulador
+fun main() {
+    println("🏍️ SIMULADOR DE MOTOGP 🏁")
+    println("=" * 30)
+    
+    demoSIMULADOR()
+}
+
 // Llamar a la demo desde main()
 fun main() {
     println("🏍️ SIMULADOR DE MOTOGP 🏁")
