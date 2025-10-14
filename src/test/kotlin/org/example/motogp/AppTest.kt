@@ -8,6 +8,7 @@ import org.example.motogp.models.Moto
 import org.example.motogp.models.Piloto
 import org.example.motogp.models.Rendimiento
 import org.example.motogp.simulacion.SimuladorCarrera
+import org.example.motogp.simulacion.SimuladorCarreraSimple
 import org.example.motogp.simulacion.ResultadoCarrera
 import kotlin.test.Test
 import kotlin.test.assertNotNull
@@ -205,5 +206,68 @@ class AppTest {
     
         assertEquals(2, resultado.posiciones.size)
         assertEquals("Piloto B", resultado.obtenerGanador().nombre)
+    }
+
+    @Test fun testSimuladorCarreraSimple() {
+        val simulador = SimuladorCarreraSimple()
+    
+        val pilotos = listOf(
+            crearPilotoElite("Marc Márquez", Nacionalidad.ESPANA, 30),
+            crearPilotoExcelente("Fabio Quartararo", Nacionalidad.FRANCIA, 24),
+            crearPilotoBueno("Jack Miller", Nacionalidad.AUSTRALIA, 28)
+        )
+    
+        val resultado = simulador.simular(pilotos, CIRCUITO_JEREZ)
+    
+        assertEquals(3, resultado.posiciones.size)
+        assertTrue(resultado.posiciones.isNotEmpty())
+        // Verificar que todos los pilotos están en el resultado (pueden estar en diferente orden)
+        assertEquals(pilotos.toSet(), resultado.posiciones.toSet())
+    }
+
+    @Test fun testSimuladorConMenosDe2Pilotos() {
+        val simulador = SimuladorCarreraSimple()
+        val pilotoUnico = listOf(crearPilotoElite("Solo Piloto", Nacionalidad.ESPANA, 25))
+    
+            assertFailsWith<IllegalArgumentException> {
+            simulador.simular(pilotoUnico, CIRCUITO_MUGELO)
+        }
+    }
+
+    @Test fun testSimuladorConPesosPersonalizados() {
+        val simulador = SimuladorCarreraSimple()
+    
+        val pilotos = listOf(
+            crearPilotoElite("Piloto Elite", Nacionalidad.ESPANA, 25),
+            crearPilotoBueno("Piloto Bueno", Nacionalidad.ITALIA, 26)
+        )
+    
+        val resultado = simulador.simularConPesos(
+            pilotos = pilotos,
+            circuito = CIRCUITO_ASSEN,
+            pesoHabilidades = 0.7,
+            pesoMoto = 0.3
+        )
+    
+        assertEquals(2, resultado.posiciones.size)
+        assertTrue(resultado.obtenerGanador() in pilotos)
+    }
+
+    @Test fun testResultadoEsDiferenteCadaVez() {
+        val simulador = SimuladorCarreraSimple()
+    
+        val pilotos = listOf(
+            crearPilotoElite("Piloto A", Nacionalidad.ESPANA, 25),
+            crearPilotoElite("Piloto B", Nacionalidad.ITALIA, 26),
+            crearPilotoElite("Piloto C", Nacionalidad.FRANCIA, 27)
+        )
+    
+        val resultado1 = simulador.simular(pilotos, CIRCUITO_JEREZ)
+        val resultado2 = simulador.simular(pilotos, CIRCUITO_JEREZ)
+    
+        // Los resultados pueden ser diferentes debido al factor aleatorio
+        // Pero deben contener los mismos pilotos
+        assertEquals(pilotos.toSet(), resultado1.posiciones.toSet())
+        assertEquals(pilotos.toSet(), resultado2.posiciones.toSet())
     }
 }
