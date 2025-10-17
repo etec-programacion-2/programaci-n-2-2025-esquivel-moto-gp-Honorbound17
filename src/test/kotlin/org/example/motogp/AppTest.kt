@@ -10,6 +10,8 @@ import org.example.motogp.models.Rendimiento
 import org.example.motogp.simulacion.SimuladorCarrera
 import org.example.motogp.simulacion.SimuladorCarreraSimple
 import org.example.motogp.simulacion.ResultadoCarrera
+import org.example.motogp.carrera.GestionModoCarrera
+import org.example.motogp.carrera.SistemaPuntos
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertEquals
@@ -269,5 +271,126 @@ class AppTest {
         // Pero deben contener los mismos pilotos
         assertEquals(pilotos.toSet(), resultado1.posiciones.toSet())
         assertEquals(pilotos.toSet(), resultado2.posiciones.toSet())
+    }
+
+    @Test fun testSistemaPuntos() {
+        assertEquals(25, SistemaPuntos.obtenerPuntos(1))
+        assertEquals(20, SistemaPuntos.obtenerPuntos(2))
+        assertEquals(1, SistemaPuntos.obtenerPuntos(15))
+        assertEquals(0, SistemaPuntos.obtenerPuntos(16))
+        assertEquals(0, SistemaPuntos.obtenerPuntos(0))
+    }
+
+    @Test fun testEstadoTemporada() {
+        val piloto = crearPilotoElite("Jugador", Nacionalidad.ESPANA, 25)
+        val estado = EstadoTemporada(
+            pilotoJugador = piloto,
+            carreraActual = 5,
+            totalCarreras = 20,
+            puntosPilotos = mapOf(piloto to 100),
+            puntosEquipos = mapOf("Ducati" to 150),
+            calendario = listOf(CIRCUITO_JEREZ, CIRCUITO_MUGELO),
+            dificultad = 75
+        )
+    
+        assertEquals(5, estado.carreraActual)
+        assertEquals(20, estado.totalCarreras)
+        assertEquals(1, estado.obtenerPosicionJugador())
+        assertFalse(estado.temporadaCompletada())
+    }
+
+    // Mock para testing de la interfaz
+    class GestionModoCarreraMock : GestionModoCarrera {
+        private var temporadaIniciada = false
+    
+        override fun iniciarNuevaCarrera(pilotoJugador: Piloto, dificultad: Int) {
+            emporadaIniciada = true
+        }
+    
+        override fun configurarTemporada(numeroCarreras: Int, equiposParticipantes: List<String>) {
+            // Mock implementation
+        }
+    
+        override fun simularSiguienteCarrera(): ResultadoCarrera {
+            return ResultadoCarrera(emptyList())
+        }
+    
+        override fun avanzarSiguienteEvento() {
+            // Mock implementation
+        }
+    
+        override fun simularCarreraPersonalizada(circuito: Circuito, pilotos: List<Piloto>): ResultadoCarrera {
+            return ResultadoCarrera(pilotos)
+        }
+    
+        override fun obtenerClasificacionGeneral(): Map<Piloto, Int> {
+            return emptyMap()
+        }
+    
+        override fun obtenerEstadoJugador(): String {
+            return "Estado mock del jugador"
+        }
+    
+        override fun obtenerClasificacionConstructores(): Map<String, Int> {
+            return emptyMap()
+        }
+    
+        override fun obtenerCalendario(): List<Circuito> {
+            return emptyList()
+        }
+    
+        override fun obtenerProximaCarrera(): Circuito? {
+            return null
+        }
+    
+        override fun obtenerProgresoTemporada(): Pair<Int, Int> {
+            return Pair(0, 0)
+        }
+    
+        override fun intentarFichaje(equipoDestino: String): Boolean {
+            return false
+        }
+    
+        override fun mejorarHabilidad(tipoHabilidad: String, puntos: Int): Boolean {
+            return false
+        }
+    
+        override fun obtenerEquiposDisponibles(): List<String> {
+            return emptyList()
+        }
+    
+        override fun temporadaEnCurso(): Boolean {
+            return temporadaIniciada
+        }
+    
+        override fun temporadaFinalizada(): Boolean {
+            return false
+        }
+    
+        override fun guardarProgreso(nombreArchivo: String): Boolean {
+            return true
+        }
+    
+        override fun cargarProgreso(nombreArchivo: String): Boolean {
+            return true
+        }
+    
+        override fun finalizarTemporada(): String {
+            return "Resumen mock de temporada"
+        }
+    }
+
+    @Test fun testInterfazGestionModoCarrera() {
+        val gestion = GestionModoCarreraMock()
+        val piloto = crearPilotoElite("Jugador Test", Nacionalidad.ESPANA, 25)
+    
+        // Test de inicio de temporada
+        gestion.iniciarNuevaCarrera(piloto, 75)
+        assertTrue(gestion.temporadaEnCurso())
+    
+        // Test de métodos de consulta
+        assertNotNull(gestion.obtenerEstadoJugador())
+        assertNotNull(gestion.obtenerClasificacionGeneral())
+        assertNotNull(gestion.obtenerCalendario())
     }
 }
