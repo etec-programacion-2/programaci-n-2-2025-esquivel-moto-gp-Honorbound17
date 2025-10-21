@@ -11,6 +11,7 @@ import org.example.motogp.simulacion.SimuladorCarrera
 import org.example.motogp.simulacion.SimuladorCarreraSimple
 import org.example.motogp.simulacion.ResultadoCarrera
 import org.example.motogp.carrera.GestionModoCarrera
+import org.example.motogp.carrera.ModoCarreraManager
 import org.example.motogp.carrera.SistemaPuntos
 import kotlin.test.Test
 import kotlin.test.assertNotNull
@@ -392,5 +393,61 @@ class AppTest {
         assertNotNull(gestion.obtenerEstadoJugador())
         assertNotNull(gestion.obtenerClasificacionGeneral())
         assertNotNull(gestion.obtenerCalendario())
+    }
+
+    @Test fun testModoCarreraManagerInicializacion() {
+        val manager = ModoCarreraManager()
+        val piloto = crearPilotoElite("Jugador Test", Nacionalidad.ESPANA, 25)
+    
+        // Test de inicialización
+        manager.iniciarNuevaCarrera(piloto, 75)
+        assertTrue(manager.temporadaEnCurso())
+        assertFalse(manager.temporadaFinalizada())
+    }
+
+    @Test fun testModoCarreraManagerSimulacion() {
+        val manager = ModoCarreraManager()
+        val piloto = crearPilotoElite("Jugador Test", Nacionalidad.ESPANA, 25)
+    
+        manager.iniciarNuevaCarrera(piloto, 50)
+    
+        // Simular una carrera
+        val resultado = manager.simularSiguienteCarrera()
+    
+        assertNotNull(resultado)
+        assertTrue(resultado.posiciones.isNotEmpty())
+        assertTrue(manager.obtenerClasificacionGeneral().isNotEmpty())
+    }
+
+    @Test fun testModoCarreraManagerEstado() {
+        val manager = ModoCarreraManager()
+        val piloto = crearPilotoElite("Jugador Test", Nacionalidad.ESPANA, 25)
+    
+        manager.iniciarNuevaCarrera(piloto, 75)
+    
+        val estado = manager.obtenerEstadoJugador()
+        assertTrue(estado.contains("Jugador Test"))
+        assertTrue(estado.contains("Posición"))
+    
+        val clasificacion = manager.obtenerClasificacionGeneral()
+        assertTrue(clasificacion.containsKey(piloto))
+    }
+
+    @Test fun testModoCarreraManagerMultiplesCarreras() {
+        val manager = ModoCarreraManager()
+        val piloto = crearPilotoElite("Jugador Test", Nacionalidad.ESPANA, 25)
+    
+        // Configurar temporada corta para testing
+        manager.configurarTemporada(3)
+        manager.iniciarNuevaCarrera(piloto, 50)
+    
+        // Simular múltiples carreras
+        repeat(3) {
+            val resultado = manager.simularSiguienteCarrera()
+            assertNotNull(resultado)
+        }
+    
+        // Verificar que la temporada finalizó
+        assertTrue(manager.temporadaFinalizada())
     }
 }

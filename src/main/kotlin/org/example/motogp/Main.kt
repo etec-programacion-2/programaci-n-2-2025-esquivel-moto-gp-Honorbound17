@@ -1,28 +1,62 @@
 package org.example.motogp
 
+import org.example.motogp.carrera.ModoCarreraManager
 import org.example.motogp.enums.Nacionalidad
-import org.example.motogp.enums.RangoHabilidad
-import org.example.motogp.models.Habilidades
-import org.example.motogp.models.Piloto
 import org.example.motogp.models.crearPilotoElite
-import org.example.motogp.models.crearMotoDucatiGP24
+import org.example.motogp.simulacion.SimuladorCarreraSimple
 
 /**
  * Función principal del simulador de MotoGP
  */
 fun main() {
-    println("🏍️ SIMULADOR DE MOTOGP 🏁")
-    println("=" * 30)
+    println("🏍️ SIMULADOR DE MOTOGP - MODO CARRERA 🏁")
+    println("=" * 45)
     
-    // Crear un piloto de ejemplo
-    val piloto = crearPilotoElite("Marc Márquez", Nacionalidad.ESPANA, 30)
-    val moto = crearMotoDucatiGP24()
-    
-    // Mostrar información
-    mostrarInformacionPiloto(piloto)
-    println()
-    mostrarInformacionMoto(moto)
+    demoModoCarreraCompleto()
 }
+
+// === NUEVA FUNCIÓN QUE DEBES AGREGAR ===
+fun demoModoCarreraCompleto() {
+    println("\n🎮 DEMO COMPLETO - MODO CARRERA MANAGER")
+    println("=" * 50)
+    
+    // Crear el gestor con inyección de dependencias
+    val simulador = SimuladorCarreraSimple()
+    val manager = ModoCarreraManager(simulador)
+    
+    // PASO 1: Crear piloto jugador
+    val pilotoJugador = crearPilotoElite("Alex Rins", Nacionalidad.ESPANA, 27)
+    
+    // PASO 2: Configurar e iniciar temporada
+    manager.configurarTemporada(4) // 4 carreras
+    manager.iniciarNuevaCarrera(pilotoJugador, 75)
+    
+    println("🎯 TEMPORADA INICIADA")
+    println(manager.obtenerEstadoJugador())
+    
+    // PASO 3: Simular todas las carreras
+    while (manager.temporadaEnCurso() && !manager.temporadaFinalizada()) {
+        val proximaCarrera = manager.obtenerProximaCarrera()
+        println("\n🏁 PRÓXIMA CARRERA: ${proximaCarrera?.nombre ?: "Final"}")
+        
+        val resultado = manager.simularSiguienteCarrera()
+        println(resultado.resumen())
+        
+        // Mostrar clasificación actualizada
+        println("\n📊 CLASIFICACIÓN ACTUAL:")
+        manager.obtenerClasificacionGeneral().forEach { (piloto, puntos) ->
+            val emoji = if (piloto == pilotoJugador) "🎯" else "👤"
+            println("$emoji ${piloto.nombre}: $puntos pts")
+        }
+    }
+    
+    // PASO 4: Finalizar temporada
+    println("\n🏆 FIN DE TEMPORADA")
+    val resumen = manager.finalizarTemporada()
+    println(resumen)
+}
+
+// === MANTÉN TODAS ESTAS FUNCIONES EXISTENTES (las puedes comentar si quieres) ===
 
 fun mostrarInformacionPiloto(piloto: Piloto) {
     println("👤 PILOTO:")
@@ -49,7 +83,7 @@ fun mostrarInformacionMoto(moto: Moto) {
 }
 
 // Función de extensión para formatear números
-fun Double.format(digits: Int) = "% .${digits}f".format(this)
+fun Double.format(digits: Int) = "%.${digits}f".format(this)
 
 // Función de extensión para repetir strings (útil para separadores)
 operator fun String.times(n: Int) = this.repeat(n)
@@ -146,20 +180,4 @@ fun demoSIMULADOR() {
         pesoMoto = 0.3
     )
     println(resultadoPersonalizado.resumen())
-}
-
-// Actualizar la función main para incluir la demo del simulador
-fun main() {
-    println("🏍️ SIMULADOR DE MOTOGP 🏁")
-    println("=" * 30)
-    
-    demoSIMULADOR()
-}
-
-// Llamar a la demo desde main()
-fun main() {
-    println("🏍️ SIMULADOR DE MOTOGP 🏁")
-    println("=" * 30)
-    
-    demoEquipos()
 }
