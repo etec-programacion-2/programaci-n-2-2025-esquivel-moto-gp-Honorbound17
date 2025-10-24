@@ -275,6 +275,115 @@ class ModoCarreraManager(
         return resumen
     }
     
+    override fun guardarPartida(fichero: String): Boolean {
+        val estado = estadoTemporada ?: return false
+        val piloto = pilotoJugador ?: return false
+    
+        try {
+            // Crear estado serializable
+            val estadoSerializable = EstadoTemporadaSerializable(
+                nombrePilotoJugador = piloto.nombre,
+                nacionalidadPiloto = piloto.nacionalidad.name,
+                edadPiloto = piloto.edad,
+                carreraActual = estado.carreraActual,
+                totalCarreras = estado.totalCarreras,
+                puntosPilotos = puntosPilotos.mapKeys { it.key.nombre },
+                puntosEquipos = puntosEquipos,
+                nombresCircuitos = calendario.map { it.nombre },
+                dificultad = dificultad,
+                historialCarreras = historialCarreras.size
+            )
+        
+            // Convertir a JSON y guardar
+            val json = estadoSerializable.toJson()
+            val archivoCompleto = if (fichero.endsWith(".motojson")) fichero else "$fichero.motojson"
+        
+            val exito = GestorArchivos.guardarString(json, archivoCompleto)
+        
+            if (exito) {
+                println("💾 Partida guardada correctamente: $archivoCompleto")
+                println("📊 Progreso: ${estado.carreraActual - 1}/${estado.totalCarreras} carreras")
+            } else {
+                println("❌ Error al guardar la partida")
+            }
+        
+            return exito
+        } catch (e: Exception) {
+            println("❌ Error en guardado: ${e.message}")
+            return false
+        }
+    }
+
+    override fun cargarPartida(fichero: String): Boolean {
+        try {
+            val archivoCompleto = if (fichero.endsWith(".motojson")) fichero else "$fichero.motojson"
+            val json = GestorArchivos.cargarString(archivoCompleto) ?: return false
+        
+            // Deserializar
+            val estadoSerializable = EstadoTemporadaSerializable.fromJson(json)
+        
+            // Reconstruir piloto jugador
+            val nacionalidad = enumValueOf<Nacionalidad>(estadoSerializable.nacionalidadPiloto)
+            val pilotoJugadorCargado = crearPilotoElite(
+                estadoSerializable.nombrePilotoJugador,
+                nacionalidad,
+                estadoSerializable.edadPiloto
+            )
+        
+            // Reconstruir calendario
+            val calendarioCargado = estadoSerializable.nombresCircuitos.map { nombreCircuito ->
+                when (nombreCircuito) {
+                    "Circuito de Jerez-Ángel Nieto" -> CIRCUITO_JEREZ
+                    "Mugello Circuit" -> CIRCUITO_MUGELO
+                    "TT Circuit Assen" -> CIRCUITO_ASSEN
+                    "Silverstone Circuit" -> CIRCUITO_SILVERSTONE
+                    else -> CIRCUITO_JEREZ // Por defecto
+                }
+            }
+        
+            // Reconstruir puntos de pilotos (simplificado - solo guardamos nombres)
+            val puntosPilotosCargados = mutableMapOf<Piloto, Int>()
+            puntosPilotosCargados[pilotoJugadorCargado] = estadoSerializable.puntosPilotos[estadoSerializable.nombrePilotoJugador] ?: 0
+        
+            // Reconstruir estado
+            this.pilotoJugador = pilotoJugadorCargado
+            this.dificultad = estadoSerializable.dificultad
+            this.calendario.clear()
+            this.calendario.addAll(calendarioCargado)
+            this.puntosPilotos.clear()
+            this.puntosPilotos.putAll(puntosPilotosCargados)
+            this.puntosEquipos.clear()
+            this.puntosEquipos.putAll(estadoSerializable.puntosEquipos)
+        
+            this.estadoTemporada = EstadoTemporada(
+                pilotoJugador = pilotoJugadorCargado,
+                carreraActual = estadoSerializable.carreraActual,
+                totalCarreras = estadoSerializable.totalCarreras,
+                puntosPilotos = puntosPilotosCargados,
+                puntosEquipos = estadoSerializable.puntosEquipos,
+                calendario = calendarioCargado,
+                dificultad = estadoSerializable.dificultad
+            )
+        
+            // Re-inicializar equipos y pilotos CPU
+            inicializarEquiposYCalendario()
+        
+            println("📂 Partida cargada correctamente: $archivoCompleto")
+            println("🎯 Piloto: ${pilotoJugadorCargado.nombre}")
+            println("📊 Progreso: ${estadoSerializable.carreraActual - 1}/${estadoSerializable.totalCarreras} carreras")
+            println("🏆 Puntos: ${puntosPilotosCargados[pilotoJugadorCargado] ?: 0}")
+        
+            return true
+        } catch (e: Exception) {
+            println("❌ Error al cargar partida: ${e.message}")
+            return false
+        }
+    }
+
+    fun listarPartidasGuardadas(): List<String> {
+        return GestorArchivos.listarPartidasGuardadas()
+    }
+
     // --- MÉTODOS PRIVADOS DE APOYO ---
     
     private fun inicializarEquiposYCalendario() {

@@ -13,6 +13,8 @@ import org.example.motogp.simulacion.ResultadoCarrera
 import org.example.motogp.carrera.GestionModoCarrera
 import org.example.motogp.carrera.ModoCarreraManager
 import org.example.motogp.carrera.SistemaPuntos
+import org.example.motogp.carrera.EstadoTemporadaSerializable
+import org.example.motogp.carrera.GestorArchivos
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 import kotlin.test.assertEquals
@@ -449,5 +451,52 @@ class AppTest {
     
         // Verificar que la temporada finalizó
         assertTrue(manager.temporadaFinalizada())
+    }
+
+    @Test fun testSerializacionEstadoTemporada() {
+        val estado = EstadoTemporadaSerializable(
+            nombrePilotoJugador = "Jugador Test",
+            nacionalidadPiloto = "ESPANA",
+            edadPiloto = 25,
+            carreraActual = 3,
+            totalCarreras = 10,
+            puntosPilotos = mapOf("Jugador Test" to 45),
+            puntosEquipos = mapOf("Ducati" to 80),
+            nombresCircuitos = listOf("Jerez", "Mugello"),
+            dificultad = 75
+        )
+    
+        // Test serialización
+        val json = estado.toJson()
+        assertTrue(json.contains("Jugador Test"))
+        assertTrue(json.contains("ESPANA"))
+    
+        // Test deserialización
+        val estadoRecuperado = EstadoTemporadaSerializable.fromJson(json)
+        assertEquals("Jugador Test", estadoRecuperado.nombrePilotoJugador)
+        assertEquals(45, estadoRecuperado.puntosPilotos["Jugador Test"])
+    }
+
+    @Test fun testGuardadoYCargaManager() {
+        val manager = ModoCarreraManager()
+        val piloto = crearPilotoElite("Jugador Guardado", Nacionalidad.ESPANA, 25)
+    
+        // Iniciar temporada y simular una carrera
+        manager.iniciarNuevaCarrera(piloto, 60)
+        manager.simularSiguienteCarrera()
+    
+        // Guardar partida
+        val archivoTest = "test_partida.motojson"
+        val guardadoExitoso = manager.guardarPartida(archivoTest)
+        assertTrue(guardadoExitoso)
+    
+        // Crear nuevo manager y cargar
+        val manager2 = ModoCarreraManager()
+        val cargaExitosa = manager2.cargarPartida(archivoTest)
+        assertTrue(cargaExitosa)
+        assertTrue(manager2.temporadaEnCurso())
+    
+        // Limpiar archivo de test
+        File(archivoTest).delete()
     }
 }
