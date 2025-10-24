@@ -12,6 +12,10 @@ fun main() {
     println("🏍️ SIMULADOR DE MOTOGP - MODO CARRERA 🏁")
     println("=" * 45)
     
+    println("🏍️ SIMULADOR DE MOTOGP - SISTEMA DE GUARDADO 🏁")
+    println("=" * 50)
+    
+    demoGuardadoYCarga()
     demoModoCarreraCompleto()
 }
 
@@ -180,4 +184,58 @@ fun demoSIMULADOR() {
         pesoMoto = 0.3
     )
     println(resultadoPersonalizado.resumen())
+}
+
+fun demoGuardadoYCarga() {
+    println("\n💾 DEMO SISTEMA DE GUARDADO/CARGA")
+    println("=" * 45)
+    
+    val manager = ModoCarreraManager()
+    
+    // PASO 1: Crear y simular parte de una temporada
+    println("🎮 Creando nueva partida...")
+    val piloto = crearPilotoElite("Carlos Sainz", Nacionalidad.ESPANA, 29)
+    manager.configurarTemporada(3)
+    manager.iniciarNuevaCarrera(piloto, 70)
+    
+    // Simular primera carrera
+    manager.simularSiguienteCarrera()
+    println("✅ Primera carrera simulada")
+    println(manager.obtenerEstadoJugador())
+    
+    // PASO 2: Guardar partida
+    println("\n💾 Guardando partida...")
+    val guardadoExitoso = manager.guardarPartida("mi_partida")
+    if (guardadoExitoso) {
+        println("✅ Partida guardada correctamente")
+    }
+    
+    // PASO 3: Simular un poco más
+    manager.simularSiguienteCarrera()
+    println("\n🏁 Segunda carrera simulada")
+    println(manager.obtenerEstadoJugador())
+    
+    // PASO 4: Cargar partida
+    println("\n📂 Cargando partida guardada...")
+    val managerNuevo = ModoCarreraManager()
+    val cargaExitosa = managerNuevo.cargarPartida("mi_partida")
+    
+    if (cargaExitosa) {
+        println("✅ Partida cargada correctamente")
+        println(managerNuevo.obtenerEstadoJugador())
+        
+        // Continuar desde el punto guardado
+        println("\n🏁 Continuando desde partida guardada...")
+        while (managerNuevo.temporadaEnCurso()) {
+            managerNuevo.simularSiguienteCarrera()
+            println(managerNuevo.obtenerEstadoJugador())
+        }
+    }
+    
+    // Limpiar archivo de demo
+    try {
+        File("mi_partida.motojson").delete()
+    } catch (e: Exception) {
+        // Ignorar errores de limpieza
+    }
 }

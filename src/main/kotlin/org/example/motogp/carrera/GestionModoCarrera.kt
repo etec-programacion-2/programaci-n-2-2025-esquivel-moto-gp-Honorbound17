@@ -245,4 +245,20 @@ object SistemaPuntos {
             }
         }.toMap()
     }
+
+    /**
+    * Guarda el estado actual de la partida en un archivo.
+    * 
+    *  @param fichero Ruta del archivo donde guardar
+    * @return true si se guardó correctamente, false en caso de error
+    */
+    fun guardarPartida(fichero: String): Boolean
+
+    /**
+    * Carga el estado de una partida desde un archivo.
+    * 
+    * @param fichero Ruta del archivo a cargar
+    * @return true si se cargó correctamente, false en caso de error
+    */
+    fun cargarPartida(fichero: String): Boolean
 }
