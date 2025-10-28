@@ -3,239 +3,368 @@ package org.example.motogp
 import org.example.motogp.carrera.ModoCarreraManager
 import org.example.motogp.enums.Nacionalidad
 import org.example.motogp.models.crearPilotoElite
+import org.example.motogp.models.crearPilotoExcelente
+import org.example.motogp.models.crearPilotoBueno
 import org.example.motogp.simulacion.SimuladorCarreraSimple
+import kotlin.system.exitProcess
+
+
+fun main() {
+    println("🏍️".repeat(5) + " MOTOGP SIMULATOR " + "🏍️".repeat(5))
+    println("=" * 50)
+    
+    val gestorCarrera = ModoCarreraManager(SimuladorCarreraSimple())
+    val interfazUsuario = InterfazUsuario(gestorCarrera)
+    
+    // Bucle principal de la aplicación
+    interfazUsuario.ejecutar()
+}
 
 /**
- * Función principal del simulador de MotoGP
+ * Clase que maneja exclusivamente la interfaz de usuario.
  */
-fun main() {
-    println("🏍️ SIMULADOR DE MOTOGP - MODO CARRERA 🏁")
-    println("=" * 45)
+class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.GestionModoCarrera) {
     
-    println("🏍️ SIMULADOR DE MOTOGP - SISTEMA DE GUARDADO 🏁")
-    println("=" * 50)
-    
-    demoGuardadoYCarga()
-    demoModoCarreraCompleto()
-}
-
-// === NUEVA FUNCIÓN QUE DEBES AGREGAR ===
-fun demoModoCarreraCompleto() {
-    println("\n🎮 DEMO COMPLETO - MODO CARRERA MANAGER")
-    println("=" * 50)
-    
-    // Crear el gestor con inyección de dependencias
-    val simulador = SimuladorCarreraSimple()
-    val manager = ModoCarreraManager(simulador)
-    
-    // PASO 1: Crear piloto jugador
-    val pilotoJugador = crearPilotoElite("Alex Rins", Nacionalidad.ESPANA, 27)
-    
-    // PASO 2: Configurar e iniciar temporada
-    manager.configurarTemporada(4) // 4 carreras
-    manager.iniciarNuevaCarrera(pilotoJugador, 75)
-    
-    println("🎯 TEMPORADA INICIADA")
-    println(manager.obtenerEstadoJugador())
-    
-    // PASO 3: Simular todas las carreras
-    while (manager.temporadaEnCurso() && !manager.temporadaFinalizada()) {
-        val proximaCarrera = manager.obtenerProximaCarrera()
-        println("\n🏁 PRÓXIMA CARRERA: ${proximaCarrera?.nombre ?: "Final"}")
+    /**
+     * Maneja el flujo completo de interacción con el usuario
+     */
+    fun ejecutar() {
+        var ejecutando = true
         
-        val resultado = manager.simularSiguienteCarrera()
-        println(resultado.resumen())
-        
-        // Mostrar clasificación actualizada
-        println("\n📊 CLASIFICACIÓN ACTUAL:")
-        manager.obtenerClasificacionGeneral().forEach { (piloto, puntos) ->
-            val emoji = if (piloto == pilotoJugador) "🎯" else "👤"
-            println("$emoji ${piloto.nombre}: $puntos pts")
-        }
-    }
-    
-    // PASO 4: Finalizar temporada
-    println("\n🏆 FIN DE TEMPORADA")
-    val resumen = manager.finalizarTemporada()
-    println(resumen)
-}
-
-// === MANTÉN TODAS ESTAS FUNCIONES EXISTENTES (las puedes comentar si quieres) ===
-
-fun mostrarInformacionPiloto(piloto: Piloto) {
-    println("👤 PILOTO:")
-    println("Nombre: ${piloto.nombre}")
-    println("Nacionalidad: ${piloto.nacionalidad}")
-    println("Edad: ${piloto.edad} años")
-    println("Rango: ${piloto.rango}")
-    println("Habilidades:")
-    println("  - Velocidad: ${piloto.habilidades.velocidadFinal.format(2)}")
-    println("  - Frenada: ${piloto.habilidades.frenadaFinal.format(2)}")
-    println("  - Curvas: ${piloto.habilidades.pasoPorCurvaFinal.format(2)}")
-    println("  - Promedio: ${piloto.habilidades.promedioHabilidades().format(2)}")
-}
-
-fun mostrarInformacionMoto(moto: Moto) {
-    println("🏍️ MOTO:")
-    println("Fabricante: ${moto.marca}")
-    println("Modelo: ${moto.modelo}")
-    println("Rendimiento:")
-    println("  - Velocidad máxima: ${moto.rendimiento.velocidadMaxima}")
-    println("  - Aceleración: ${moto.rendimiento.aceleracion}")
-    println("  - Maniobrabilidad: ${moto.rendimiento.maniobrabilidad}")
-    println("  - Puntaje total: ${moto.rendimiento.puntajeTotal()}")
-}
-
-// Función de extensión para formatear números
-fun Double.format(digits: Int) = "%.${digits}f".format(this)
-
-// Función de extensión para repetir strings (útil para separadores)
-operator fun String.times(n: Int) = this.repeat(n)
-
-fun demoEquipos() {
-    println("\n🏁 DEMO DE EQUIPOS MOTOGP")
-    println("=" * 40)
-    
-    // Crear equipos
-    val ducati = crearEquipoDucatiLenovo()
-    val honda = crearEquipoRepsolHonda()
-    val yamaha = crearEquipoYamaha()
-    
-    // Crear pilotos
-    val bagnaia = crearPilotoElite("Francesco Bagnaia", Nacionalidad.ITALIA, 26)
-    val bastianini = crearPilotoExcelente("Enea Bastianini", Nacionalidad.ITALIA, 25)
-    val marquez = crearPilotoElite("Marc Márquez", Nacionalidad.ESPANA, 30)
-    val quartararo = crearPilotoExcelente("Fabio Quartararo", Nacionalidad.FRANCIA, 24)
-    
-    // Fichar pilotos
-    ducati.ficharPiloto(bagnaia)
-    ducati.ficharPiloto(bastianini)
-    honda.ficharPiloto(marquez)
-    yamaha.ficharPiloto(quartararo)
-    
-    // Mostrar información de equipos
-    listOf(ducati, honda, yamaha).forEach { equipo ->
-        println(equipo.descripcion())
-        println()
-    }
-}
-
-fun demoSIMULADOR() {
-    println("\n🎮 DEMO DEL SIMULADOR DE CARRERAS")
-    println("=" * 45)
-    
-    val simulador = SimuladorCarreraSimple()
-    
-    // Crear equipos y pilotos
-    val ducati = crearEquipoDucatiLenovo()
-    val honda = crearEquipoRepsolHonda()
-    val yamaha = crearEquipoYamaha()
-    
-    val bagnaia = crearPilotoElite("Francesco Bagnaia", Nacionalidad.ITALIA, 26).apply {
-        ducati.ficharPiloto(this)
-    }
-    val bastianini = crearPilotoExcelente("Enea Bastianini", Nacionalidad.ITALIA, 25).apply {
-        ducati.ficharPiloto(this)
-    }
-    val marquez = crearPilotoElite("Marc Márquez", Nacionalidad.ESPANA, 30).apply {
-        honda.ficharPiloto(this)
-    }
-    val quartararo = crearPilotoExcelente("Fabio Quartararo", Nacionalidad.FRANCIA, 24).apply {
-        yamaha.ficharPiloto(this)
-    }
-    
-    val pilotos = listOf(bagnaia, bastianini, marquez, quartararo)
-    
-    // Simular carreras en diferentes circuitos
-    val circuitos = listOf(
-        CIRCUITO_JEREZ to "Jerez",
-        CIRCUITO_MUGELO to "Mugello", 
-        CIRCUITO_ASSEN to "Assen"
-    )
-    
-    circuitos.forEach { (circuito, nombre) ->
-        println("\n🏁 CARRERA EN: ${circuito.nombre}")
-        println("📏 ${circuito.descripcion()}")
-        
-        val resultado = simulador.simular(pilotos, circuito)
-        println(resultado.resumen())
-        
-        // Mostrar puntuación del campeonato simplificada
-        println("\n📊 PUNTUACIONES:")
-        resultado.posiciones.forEachIndexed { index, piloto ->
-            val puntos = when (index) {
-                0 -> 25
-                1 -> 20
-                2 -> 16
-                3 -> 13
-                4 -> 11
-                else -> 0
+        while (ejecutando) {
+            mostrarMenuPrincipal()
+            
+            when (obtenerOpcionUsuario(1, 4)) {
+                1 -> iniciarNuevaPartida()
+                2 -> cargarPartida()
+                3 -> mostrarCreditos()
+                4 -> {
+                    println("👋 ¡Gracias por jugar al MotoGP Simulator!")
+                    ejecutando = false
+                }
             }
-            println("${index + 1}. ${piloto.nombre} - $puntos pts")
         }
     }
     
-    // Demo de simulación con pesos personalizados
-    println("\n⚖️  SIMULACIÓN CON PESOS PERSONALIZADOS (70% habilidades, 30% moto)")
-    val resultadoPersonalizado = simulador.simularConPesos(
-        pilotos = pilotos,
-        circuito = CIRCUITO_SILVERSTONE,
-        pesoHabilidades = 0.7,
-        pesoMoto = 0.3
-    )
-    println(resultadoPersonalizado.resumen())
-}
-
-fun demoGuardadoYCarga() {
-    println("\n💾 DEMO SISTEMA DE GUARDADO/CARGA")
-    println("=" * 45)
-    
-    val manager = ModoCarreraManager()
-    
-    // PASO 1: Crear y simular parte de una temporada
-    println("🎮 Creando nueva partida...")
-    val piloto = crearPilotoElite("Carlos Sainz", Nacionalidad.ESPANA, 29)
-    manager.configurarTemporada(3)
-    manager.iniciarNuevaCarrera(piloto, 70)
-    
-    // Simular primera carrera
-    manager.simularSiguienteCarrera()
-    println("✅ Primera carrera simulada")
-    println(manager.obtenerEstadoJugador())
-    
-    // PASO 2: Guardar partida
-    println("\n💾 Guardando partida...")
-    val guardadoExitoso = manager.guardarPartida("mi_partida")
-    if (guardadoExitoso) {
-        println("✅ Partida guardada correctamente")
+    /**
+     * Muestra el menú principal de la aplicación
+     */
+    private fun mostrarMenuPrincipal() {
+        println("\n" + "🎮".repeat(20))
+        println("          MENÚ PRINCIPAL")
+        println("🎮".repeat(20))
+        println("1. 🆕 Nueva Partida")
+        println("2. 📂 Cargar Partida") 
+        println("3. ℹ️  Créditos")
+        println("4. ❌ Salir")
+        println("🎮".repeat(20))
+        print("Selecciona una opción (1-4): ")
     }
     
-    // PASO 3: Simular un poco más
-    manager.simularSiguienteCarrera()
-    println("\n🏁 Segunda carrera simulada")
-    println(manager.obtenerEstadoJugador())
-    
-    // PASO 4: Cargar partida
-    println("\n📂 Cargando partida guardada...")
-    val managerNuevo = ModoCarreraManager()
-    val cargaExitosa = managerNuevo.cargarPartida("mi_partida")
-    
-    if (cargaExitosa) {
-        println("✅ Partida cargada correctamente")
-        println(managerNuevo.obtenerEstadoJugador())
+    /**
+     * Maneja el flujo de creación de una nueva partida
+     */
+    private fun iniciarNuevaPartida() {
+        println("\n" + "🚀".repeat(25))
+        println("       NUEVA PARTIDA")
+        println("🚀".repeat(25))
         
-        // Continuar desde el punto guardado
-        println("\n🏁 Continuando desde partida guardada...")
-        while (managerNuevo.temporadaEnCurso()) {
-            managerNuevo.simularSiguienteCarrera()
-            println(managerNuevo.obtenerEstadoJugador())
+        // Crear piloto jugador
+        val pilotoJugador = crearPilotoJugador()
+        
+        // Configurar dificultad
+        val dificultad = configurarDificultad()
+        
+        // Configurar temporada
+        val numeroCarreras = configurarTemporada()
+        
+        // Iniciar la partida
+        gestorCarrera.configurarTemporada(numeroCarreras)
+        gestorCarrera.iniciarNuevaCarrera(pilotoJugador, dificultad)
+        
+        println("\n✅ ¡Partida creada exitosamente!")
+        println("👤 Piloto: ${pilotoJugador.nombre}")
+        println("📅 Temporada: $numeroCarreras carreras")
+        println("⚡ Dificultad: $dificultad/100")
+        
+        // Entrar al menú de partida en curso
+        menuPartidaEnCurso()
+    }
+    
+    /**
+     * Crea el piloto del jugador mediante interacción por consola
+     */
+    private fun crearPilotoJugador(): org.example.motogp.models.Piloto {
+        println("\n👤 CREACIÓN DE PILOTO")
+        println("-".repeat(25))
+        
+        print("Nombre de tu piloto: ")
+        val nombre = readln().trim().takeIf { it.isNotBlank() } ?: "Piloto Novato"
+        
+        println("\n🏳️  Selecciona tu nacionalidad:")
+        org.example.motogp.enums.Nacionalidad.values().forEachIndexed { index, nacionalidad ->
+            println("${index + 1}. ${nacionalidad.name}")
+        }
+        val nacionalidadIndex = obtenerOpcionUsuario(1, org.example.motogp.enums.Nacionalidad.values().size) - 1
+        val nacionalidad = org.example.motogp.enums.Nacionalidad.values()[nacionalidadIndex]
+        
+        println("\n🎯 Selecciona tu nivel de experiencia:")
+        println("1. 🥇 Élite (Rango S) - Para expertos")
+        println("2. 🥈 Excelente (Rango A) - Para jugadores avanzados") 
+        println("3. 🥉 Bueno (Rango B) - Para jugadores intermedios")
+        println("4. 🔰 Novato (Rango C) - Para principiantes")
+        
+        return when (obtenerOpcionUsuario(1, 4)) {
+            1 -> crearPilotoElite(nombre, nacionalidad, 25)
+            2 -> crearPilotoExcelente(nombre, nacionalidad, 24)
+            3 -> crearPilotoBueno(nombre, nacionalidad, 23)
+            4 -> crearPilotoBueno(nombre, nacionalidad, 22).copy(
+                habilidades = crearPilotoBueno(nombre, nacionalidad, 22).habilidades.copy(
+                    velocidadBase = 60,
+                    frenadaBase = 55,
+                    pasoPorCurvaBase = 58
+                )
+            )
+            else -> crearPilotoBueno(nombre, nacionalidad, 23)
         }
     }
     
-    // Limpiar archivo de demo
-    try {
-        File("mi_partida.motojson").delete()
-    } catch (e: Exception) {
-        // Ignorar errores de limpieza
+    /**
+     * Configura la dificultad de la partida
+     */
+    private fun configurarDificultad(): Int {
+        println("\n⚡ CONFIGURAR DIFICULTAD")
+        println("-".repeat(25))
+        println("1. 🟢 Fácil (25) - Para principiantes")
+        println("2. 🟡 Normal (50) - Jugadores ocasionales")
+        println("3. 🟠 Difícil (75) - Jugadores experimentados")
+        println("4. 🔴 Élite (90) - Solo para expertos")
+        println("5. 🎯 Personalizada - Elige tu nivel")
+        
+        return when (obtenerOpcionUsuario(1, 5)) {
+            1 -> 25
+            2 -> 50
+            3 -> 75
+            4 -> 90
+            5 -> {
+                print("Introduce el nivel de dificultad (1-100): ")
+                obtenerOpcionUsuario(1, 100)
+            }
+            else -> 50
+        }
+    }
+    
+    /**
+     * Configura la duración de la temporada
+     */
+    private fun configurarTemporada(): Int {
+        println("\n📅 CONFIGURAR TEMPORADA")
+        println("-".repeat(25))
+        println("1. 🏁 Corta (5 carreras) - Para partidas rápidas")
+        println("2. 🏆 Normal (10 carreras) - Experiencia estándar")
+        println("3. 🏅 Larga (15 carreras) - Para jugadores dedicados")
+        println("4. 📊 Personalizada - Elige el número de carreras")
+        
+        return when (obtenerOpcionUsuario(1, 4)) {
+            1 -> 5
+            2 -> 10
+            3 -> 15
+            4 -> {
+                print("Introduce el número de carreras (3-20): ")
+                obtenerOpcionUsuario(3, 20)
+            }
+            else -> 10
+        }
+    }
+    
+    /**
+     * Maneja el flujo de carga de partida
+     */
+    private fun cargarPartida() {
+        println("\n" + "📂".repeat(25))
+        println("       CARGAR PARTIDA")
+        println("📂".repeat(25))
+        
+        print("Nombre de la partida a cargar: ")
+        val nombreArchivo = readln().trim().takeIf { it.isNotBlank() } ?: "partida_guardada"
+        
+        println("\n⏳ Cargando partida...")
+        val exito = gestorCarrera.cargarPartida(nombreArchivo)
+        
+        if (exito) {
+            println("✅ Partida cargada exitosamente!")
+            menuPartidaEnCurso()
+        } else {
+            println("❌ No se pudo cargar la partida '$nombreArchivo'")
+            println("💡 Asegúrate de que el archivo existe y es válido")
+        }
+    }
+    
+    /**
+     * Menú principal cuando hay una partida en curso
+     */
+    private fun menuPartidaEnCurso() {
+        var enPartida = true
+        
+        while (enPartida && gestorCarrera.temporadaEnCurso()) {
+            mostrarMenuPartida()
+            
+            when (obtenerOpcionUsuario(1, 6)) {
+                1 -> simularSiguienteCarrera()
+                2 -> mostrarEstadoActual()
+                3 -> mostrarClasificacion()
+                4 -> guardarPartidaActual()
+                5 -> menuGestionEquipo()
+                6 -> {
+                    println("← Volviendo al menú principal")
+                    enPartida = false
+                }
+            }
+        }
+        
+        // Terminó la temporada
+        if (gestorCarrera.temporadaFinalizada()) {
+            println("\n🏆 TEMPORADA FINALIZADA!")
+            val resumen = gestorCarrera.finalizarTemporada()
+            println(resumen)
+        }
+    }
+    
+    /**
+     * Muestra el menú de partida en curso
+     */
+    private fun mostrarMenuPartida() {
+        val progreso = gestorCarrera.obtenerProgresoTemporada()
+        val proximaCarrera = gestorCarrera.obtenerProximaCarrera()
+        
+        println("\n" + "🏁".repeat(25))
+        println("     PARTIDA EN CURSO")
+        println("🏁".repeat(25))
+        println("📊 Progreso: ${progreso.first}/${progreso.second} carreras")
+        proximaCarrera?.let { println("📍 Próxima: ${it.nombre}") }
+        println("🏁".repeat(25))
+        println("1. ▶️  Simular siguiente carrera")
+        println("2. 📈 Ver estado actual")
+        println("3. 🏆 Ver clasificación")
+        println("4. 💾 Guardar partida")
+        println("5. 🏍️  Gestión de equipo")
+        println("6. ← Volver al menú principal")
+        println("🏁".repeat(25))
+        print("Selecciona una opción (1-6): ")
+    }
+    
+    /**
+     * Simula la siguiente carrera del calendario
+     */
+    private fun simularSiguienteCarrera() {
+        println("\n⏳ Simulando carrera...")
+        val resultado = gestorCarrera.simularSiguienteCarrera()
+        
+        println("\n" + "🏁".repeat(40))
+        println("         RESULTADO DE CARRERA")
+        println("🏁".repeat(40))
+        println(resultado.resumen())
+        println("🏁".repeat(40))
+        
+        // Pausa para que el usuario pueda leer los resultados
+        println("\n⏎ Presiona Enter para continuar...")
+        readln()
+    }
+    
+    /**
+     * Muestra el estado actual del jugador
+     */
+    private fun mostrarEstadoActual() {
+        println("\n" + "📊".repeat(25))
+        println("       ESTADO ACTUAL")
+        println("📊".repeat(25))
+        println(gestorCarrera.obtenerEstadoJugador())
+        println("📊".repeat(25))
+    }
+    
+    /**
+     * Muestra la clasificación actual
+     */
+    private fun mostrarClasificacion() {
+        println("\n" + "🏆".repeat(25))
+        println("     CLASIFICACIÓN ACTUAL")
+        println("🏆".repeat(25))
+        
+        val clasificacion = gestorCarrera.obtenerClasificacionGeneral()
+        if (clasificacion.isEmpty()) {
+            println("No hay datos de clasificación disponibles")
+        } else {
+            clasificacion.forEachIndexed { index, (piloto, puntos) ->
+                val posicion = index + 1
+                val emoji = when (posicion) {
+                    1 -> "🥇"
+                    2 -> "🥈" 
+                    3 -> "🥉"
+                    else -> "🔸"
+                }
+                println("$emoji $posicion. ${piloto.nombre} - $puntos pts")
+            }
+        }
+        println("🏆".repeat(25))
+    }
+    
+    /**
+     * Guarda la partida actual
+     */
+    private fun guardarPartidaActual() {
+        print("\n💾 Nombre para guardar la partida: ")
+        val nombreArchivo = readln().trim().takeIf { it.isNotBlank() } ?: "partida_guardada"
+        
+        val exito = gestorCarrera.guardarPartida(nombreArchivo)
+        if (exito) {
+            println("✅ Partida guardada como '$nombreArchivo.motojson'")
+        } else {
+            println("❌ Error al guardar la partida")
+        }
+    }
+    
+    /**
+     * Menú de gestión de equipo
+     */
+    private fun menuGestionEquipo() {
+        println("\n🏍️ Gestión de equipo - En desarrollo")
+        println("💡 Próximamente: fichajes, mejoras de moto, etc.")
+        println("⏎ Presiona Enter para continuar...")
+        readln()
+    }
+    
+    /**
+     * Muestra los créditos del juego
+     */
+    private fun mostrarCreditos() {
+        println("\n" + "⭐".repeat(25))
+        println("         CRÉDITOS")
+        println("⭐".repeat(25))
+        println("🏍️  MotoGP Simulator")
+        println("🎮 Desarrollado con Kotlin")
+        println("💡 Arquitectura: Patrón Fachada")
+        println("📊 Simulador: Sistema de rangos S-A-B-C-D")
+        println("💾 Persistencia: JSON con kotlinx.serialization")
+        println("⭐".repeat(25))
+        println("⏎ Presiona Enter para continuar...")
+        readln()
+    }
+    
+    /**
+     * Obtiene una opción válida del usuario
+     */
+    private fun obtenerOpcionUsuario(min: Int, max: Int): Int {
+        while (true) {
+            try {
+                val input = readln().toInt()
+                if (input in min..max) {
+                    return input
+                } else {
+                    println("❌ Por favor, introduce un número entre $min y $max: ")
+                }
+            } catch (e: NumberFormatException) {
+                println("❌ Entrada inválida. Por favor, introduce un número: ")
+            }
+        }
     }
 }
