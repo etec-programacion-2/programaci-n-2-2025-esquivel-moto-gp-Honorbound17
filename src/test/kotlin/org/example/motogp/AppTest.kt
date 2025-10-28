@@ -499,4 +499,15 @@ class AppTest {
         // Limpiar archivo de test
         File(archivoTest).delete()
     }
+
+    @Test fun testInterfazUsuarioCreacion() {
+        al gestor = ModoCarreraManager()
+        val interfaz = InterfazUsuario(gestor)
+    
+        // Verificar creación
+        assertNotNull(interfaz)
+    }
+
+    @Test fun testOpcionesMenuValidas() {
+    }
 }
