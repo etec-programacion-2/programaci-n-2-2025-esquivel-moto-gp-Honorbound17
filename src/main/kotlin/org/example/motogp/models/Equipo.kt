@@ -121,64 +121,55 @@ class Equipo(
     companion object {
         const val MAX_PILOTOS = 2
     }
+}
 
-    /**
-    * Crea el equipo Repsol Honda
-    */
-    fun crearEquipoRepsolHonda(): Equipo {
-        val moto = Moto(
-            fabricante = FabricanteMoto.HONDA,
-            modelo = "RC213V",
-            rendimiento = Rendimiento(
-                velocidadMaxima = 94,
-                aceleracion = 88,
-                maniobrabilidad = 92
-            )
+fun crearEquipoRepsolHonda(): Equipo {
+    val moto = Moto(
+        fabricante = FabricanteMoto.HONDA,
+        modelo = "RC213V",
+        rendimiento = Rendimiento(
+            velocidadMaxima = 94,
+            aceleracion = 88,
+            maniobrabilidad = 92
         )
+    )
     
-        return Equipo(
-            nombre = "Repsol Honda Team",
-            moto = moto
-        )
-    }
+    return Equipo(
+        nombre = "Repsol Honda Team",
+        moto = moto
+    )
+}
 
-    /**
-    * Crea el equipo Ducati Lenovo
-    */
-    fun crearEquipoDucatiLenovo(): Equipo {
-        val moto = Moto(
-            fabricante = FabricanteMoto.DUCATI,
-            modelo = "Desmosedici GP24",
-            rendimiento = Rendimiento(
-                velocidadMaxima = 98,
-                aceleracion = 95,
-                maniobrabilidad = 90
-            )
+fun crearEquipoDucatiLenovo(): Equipo {
+    val moto = Moto(
+        fabricante = FabricanteMoto.DUCATI,
+        modelo = "Desmosedici GP24",
+        rendimiento = Rendimiento(
+            velocidadMaxima = 98,
+            aceleracion = 95,
+            maniobrabilidad = 90
         )
+    )
     
-        return Equipo(
-            nombre = "Ducati Lenovo Team",
-            moto = moto
-        )
-    }
+    return Equipo(
+        nombre = "Ducati Lenovo Team",
+        moto = moto
+    )
+}
 
-    /**
-    * Crea el equipo Monster Energy Yamaha
-    */
-    fun crearEquipoYamaha(): Equipo {
-        val moto = Moto(
-            fabricante = FabricanteMoto.YAMAHA,
-            modelo = "YZR-M1",
-            rendimiento = Rendimiento(
-                velocidadMaxima = 95,
-                aceleracion = 92,
-                maniobrabilidad = 96
-            )
+fun crearEquipoYamaha(): Equipo {
+    val moto = Moto(
+        fabricante = FabricanteMoto.YAMAHA,
+        modelo = "YZR-M1",
+        rendimiento = Rendimiento(
+            velocidadMaxima = 95,
+            aceleracion = 92,
+            maniobrabilidad = 96
         )
+    )
     
-        return Equipo(
-            nombre = "Monster Energy Yamaha",
-            moto = moto
-        )
-    }
+    return Equipo(
+        nombre = "Monster Energy Yamaha",
+        moto = moto
+    )
 }

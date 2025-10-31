@@ -16,7 +16,7 @@ data class Piloto(
     val nombre: String,
     val nacionalidad: Nacionalidad,
     val edad: Int,
-    val habilidades: Habilidades
+    val habilidades: Habilidades,
     val equipo: Equipo? = null
 ) {
     init {
