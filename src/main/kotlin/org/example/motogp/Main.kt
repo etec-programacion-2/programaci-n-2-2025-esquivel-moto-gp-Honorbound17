@@ -12,7 +12,7 @@ import kotlin.system.exitProcess
  * PUNTO DE ENTRADA PRINCIPAL DE LA APLICACIÓN
  */
 fun main() {
-    println("🏍️".repeat(5) + " MOTOGP SIMULATOR " + "🏍️".repeat(5))
+    println("🏍️".repeat(5) + " MOTOGP LEGACY " + "🏍️".repeat(5))
     println("=" * 50)
     
     val gestorCarrera = ModoCarreraManager(SimuladorCarreraSimple())
@@ -370,108 +370,6 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         }
     }
 }
-
-
-
-// ==================
-// FUNCIONES DE DEMO 
-// ==================
-
-/*
-fun demoModoCarreraCompleto() {
-    println("\n🎮 DEMO COMPLETO - MODO CARRERA MANAGER")
-    println("=" * 50)
-    
-    // Crear el gestor con inyección de dependencias
-    val simulador = SimuladorCarreraSimple()
-    val manager = ModoCarreraManager(simulador)
-    
-    // PASO 1: Crear piloto jugador
-    val pilotoJugador = crearPilotoElite("Alex Rins", Nacionalidad.ESPANA, 27)
-    
-    // PASO 2: Configurar e iniciar temporada
-    manager.configurarTemporada(4) // 4 carreras
-    manager.iniciarNuevaCarrera(pilotoJugador, 75)
-    
-    println("🎯 TEMPORADA INICIADA")
-    println(manager.obtenerEstadoJugador())
-    
-    // PASO 3: Simular todas las carreras
-    while (manager.temporadaEnCurso() && !manager.temporadaFinalizada()) {
-        val proximaCarrera = manager.obtenerProximaCarrera()
-        println("\n🏁 PRÓXIMA CARRERA: ${proximaCarrera?.nombre ?: "Final"}")
-        
-        val resultado = manager.simularSiguienteCarrera()
-        println(resultado.resumen())
-        
-        // Mostrar clasificación actualizada
-        println("\n📊 CLASIFICACIÓN ACTUAL:")
-        manager.obtenerClasificacionGeneral().forEach { (piloto, puntos) ->
-            val emoji = if (piloto == pilotoJugador) "🎯" else "👤"
-            println("$emoji ${piloto.nombre}: $puntos pts")
-        }
-    }
-    
-    // PASO 4: Finalizar temporada
-    println("\n🏆 FIN DE TEMPORADA")
-    val resumen = manager.finalizarTemporada()
-    println(resumen)
-}
-
-fun demoGuardadoYCarga() {
-    println("\n💾 DEMO SISTEMA DE GUARDADO/CARGA")
-    println("=" * 45)
-    
-    val manager = ModoCarreraManager()
-    
-    // PASO 1: Crear y simular parte de una temporada
-    println("🎮 Creando nueva partida...")
-    val piloto = crearPilotoElite("Carlos Sainz", Nacionalidad.ESPANA, 29)
-    manager.configurarTemporada(3)
-    manager.iniciarNuevaCarrera(piloto, 70)
-    
-    // Simular primera carrera
-    manager.simularSiguienteCarrera()
-    println("✅ Primera carrera simulada")
-    println(manager.obtenerEstadoJugador())
-    
-    // PASO 2: Guardar partida
-    println("\n💾 Guardando partida...")
-    val guardadoExitoso = manager.guardarPartida("mi_partida")
-    if (guardadoExitoso) {
-        println("✅ Partida guardada correctamente")
-    }
-    
-    // PASO 3: Simular un poco más
-    manager.simularSiguienteCarrera()
-    println("\n🏁 Segunda carrera simulada")
-    println(manager.obtenerEstadoJugador())
-    
-    // PASO 4: Cargar partida (debería volver al estado después de la primera carrera)
-    println("\n📂 Cargando partida guardada...")
-    val managerNuevo = ModoCarreraManager()
-    val cargaExitosa = managerNuevo.cargarPartida("mi_partida")
-    
-    if (cargaExitosa) {
-        println("✅ Partida cargada correctamente")
-        println(managerNuevo.obtenerEstadoJugador())
-        
-        // Continuar desde el punto guardado
-        println("\n🏁 Continuando desde partida guardada...")
-        while (managerNuevo.temporadaEnCurso()) {
-            managerNuevo.simularSiguienteCarrera()
-            println(managerNuevo.obtenerEstadoJugador())
-        }
-    }
-    
-    // Limpiar archivo de demo
-    try {
-        File("mi_partida.motojson").delete()
-    } catch (e: Exception) {
-        // Ignorar errores de limpieza
-    }
-}
-*/
 
 // Función de extensión para formatear números
 fun Double.format(digits: Int) = "%.${digits}f".format(this)
