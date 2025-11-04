@@ -1,4 +1,6 @@
 Esquivel Coronel Ignacio
+
+MotoGP Legacy - Simulador Profesional de Carreras
 --Prerrequisitos Obligatorios--
   
   Java JDK 17 o superior
@@ -8,6 +10,7 @@ Esquivel Coronel Ignacio
   Sistema operativo: Windows, macOS o Linux
   
 -Verificar instalación de Java: java -version
+
 -Verificar instalación de Gradle: gradle --version
 
 --Instalación y Ejecución--:
