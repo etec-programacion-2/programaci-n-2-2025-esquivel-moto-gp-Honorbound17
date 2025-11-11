@@ -6,6 +6,11 @@ import org.example.motogp.models.Equipo
 import org.example.motogp.models.crearEquipoDucatiLenovo
 import org.example.motogp.models.crearEquipoRepsolHonda
 import org.example.motogp.models.crearEquipoYamaha
+import org.example.motogp.models.crearPilotoElite
+import org.example.motogp.models.crearPilotoExcelente
+import org.example.motogp.models.crearPilotoBueno
+import org.example.motogp.enums.Nacionalidad
+import org.example.motogp.constants.CircuitosConstants
 import org.example.motogp.simulacion.ResultadoCarrera
 import org.example.motogp.simulacion.SimuladorCarrera
 import org.example.motogp.simulacion.SimuladorCarreraSimple
@@ -78,7 +83,8 @@ class ModoCarreraManager(
         
         // Calendario con número específico de carreras
         val circuitosDisponibles = listOf(
-            CIRCUITO_JEREZ, CIRCUITO_MUGELO, CIRCUITO_ASSEN, CIRCUITO_SILVERSTONE
+            CircuitosConstants.CIRCUITO_JEREZ, CircuitosConstants.CIRCUITO_MUGELO, CircuitosConstants.CIRCUITO_ASSEN
+, CircuitosConstants.CIRCUITO_SILVERSTONE
         )
         
         calendario.clear()

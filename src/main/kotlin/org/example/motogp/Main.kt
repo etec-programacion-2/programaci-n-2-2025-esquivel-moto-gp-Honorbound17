@@ -296,7 +296,7 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         if (clasificacion.isEmpty()) {
             println("No hay datos de clasificación disponibles")
         } else {
-            clasificacion.forEachIndexed { index, (piloto, puntos) ->
+            opciones.withIndex().forEach { (index, opcion) ->
                 val posicion = index + 1
                 val emoji = when (posicion) {
                     1 -> "🥇"

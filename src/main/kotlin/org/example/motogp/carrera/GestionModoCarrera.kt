@@ -252,13 +252,25 @@ object SistemaPuntos {
     *  @param fichero Ruta del archivo donde guardar
     * @return true si se guardó correctamente, false en caso de error
     */
-    fun guardarPartida(fichero: String): Boolean
-
-    /**
-    * Carga el estado de una partida desde un archivo.
-    * 
-    * @param fichero Ruta del archivo a cargar
-    * @return true si se cargó correctamente, false en caso de error
-    */
-    fun cargarPartida(fichero: String): Boolean
+    fun guardarPartida(estado: EstadoTemporada, nombreArchivo: String = "partida_guardada.json") {
+        try {
+            val json = Json { prettyPrint = true }
+            val jsonString = json.encodeToString(estado)
+            java.io.File(nombreArchivo).writeText(jsonString)
+            println("✅ Partida guardada correctamente en: $nombreArchivo")
+        } catch (e: Exception) {
+            println("❌ Error al guardar la partida: ${e.message}")
+        }
+    }
+    fun cargarPartida(nombreArchivo: String = "partida_guardada.json"): EstadoTemporada? {
+        return try {
+            val jsonString = java.io.File(nombreArchivo).readText()
+            Json.decodeFromString<EstadoTemporada>(jsonString).also {
+                println("✅ Partida cargada correctamente desde: $nombreArchivo")
+            }
+        } catch (e: Exception) {
+            println("❌ Error al cargar la partida: ${e.message}")
+            null
+        }
+    }
 }
