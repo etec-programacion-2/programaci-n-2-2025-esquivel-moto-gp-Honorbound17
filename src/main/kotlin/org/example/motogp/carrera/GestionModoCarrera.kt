@@ -9,7 +9,6 @@ import org.example.motogp.simulacion.ResultadoCarrera
  * Esta interfaz actúa como una "fachada" que oculta la complejidad interna del sistema
  * y proporciona una interfaz simplificada para el cliente.
  */
-
 interface GestionModoCarrera {
     
     // --- CONFIGURACIÓN INICIAL ---
@@ -145,7 +144,7 @@ interface GestionModoCarrera {
     /**
      * Guarda el estado actual del modo carrera.
      * 
-     * @param nombreArchivo Nombre del archivo donde guardar
+     * @param nombreArchivo Nombre del archivo donde guardar (se puede añadir extensión .motojson)
      * @return true si se guardó correctamente
      */
     fun guardarProgreso(nombreArchivo: String): Boolean
@@ -164,113 +163,4 @@ interface GestionModoCarrera {
      * @return Información del resumen de la temporada
      */
     fun finalizarTemporada(): String
-}
-
-/**
- * Data class que representa el estado completo de una temporada.
- */
-data class EstadoTemporada(
-    val pilotoJugador: Piloto,
-    val carreraActual: Int,
-    val totalCarreras: Int,
-    val puntosPilotos: Map<Piloto, Int>,
-    val puntosEquipos: Map<String, Int>,
-    val calendario: List<Circuito>,
-    val dificultad: Int,
-    val historialCarreras: List<ResultadoCarrera> = emptyList()
-) {
-    /**
-     * Calcula la posición actual del jugador en el campeonato.
-     */
-    fun obtenerPosicionJugador(): Int {
-        val puntosJugador = puntosPilotos[pilotoJugador] ?: 0
-        return puntosPilotos.entries
-            .sortedByDescending { it.value }
-            .indexOfFirst { it.key == pilotoJugador } + 1
-    }
-    
-    /**
-     * Verifica si la temporada está completada.
-     */
-    fun temporadaCompletada(): Boolean {
-        return carreraActual > totalCarreras
-    }
-}
-
-/**
- * Sistema de puntos de MotoGP.
- */
-object SistemaPuntos {
-    private val PUNTUACIONES = mapOf(
-        1 to 25,   // 1er puesto
-        2 to 20,   // 2do puesto  
-        3 to 16,   // 3er puesto
-        4 to 13,   // 4to puesto
-        5 to 11,   // 5to puesto
-        6 to 10,   // 6to puesto
-        7 to 9,    // 7mo puesto
-        8 to 8,    // 8vo puesto
-        9 to 7,    // 9no puesto
-        10 to 6,   // 10mo puesto
-        11 to 5,   // 11vo puesto
-        12 to 4,   // 12vo puesto
-        13 to 3,   // 13vo puesto
-        14 to 2,   // 14vo puesto
-        15 to 1    // 15vo puesto
-    )
-    
-    /**
-     * Obtiene los puntos para una posición dada.
-     * 
-     * @param posicion Posición de llegada (1-based)
-     * @return Puntos asignados, 0 si está fuera de los puntos
-     */
-    fun obtenerPuntos(posicion: Int): Int {
-        return PUNTUACIONES[posicion] ?: 0
-    }
-    
-    /**
-     * Calcula los puntos para un resultado de carrera.
-     * 
-     * @param resultado Resultado de la carrera
-     * @return Mapa con pilotos y puntos obtenidos
-     */
-    fun calcularPuntosCarrera(resultado: ResultadoCarrera): Map<Piloto, Int> {
-        return resultado.posiciones.mapIndexed { index, piloto ->
-            // Los abandonos no obtienen puntos
-            if (resultado.abandonos.contains(piloto)) {
-                piloto to 0
-            } else {
-                piloto to obtenerPuntos(index + 1)
-            }
-        }.toMap()
-    }
-
-    /**
-    * Guarda el estado actual de la partida en un archivo.
-    * 
-    *  @param fichero Ruta del archivo donde guardar
-    * @return true si se guardó correctamente, false en caso de error
-    */
-    fun guardarPartida(estado: EstadoTemporada, nombreArchivo: String = "partida_guardada.json") {
-        try {
-            val json = Json { prettyPrint = true }
-            val jsonString = json.encodeToString(estado)
-            java.io.File(nombreArchivo).writeText(jsonString)
-            println("✅ Partida guardada correctamente en: $nombreArchivo")
-        } catch (e: Exception) {
-            println("❌ Error al guardar la partida: ${e.message}")
-        }
-    }
-    fun cargarPartida(nombreArchivo: String = "partida_guardada.json"): EstadoTemporada? {
-        return try {
-            val jsonString = java.io.File(nombreArchivo).readText()
-            Json.decodeFromString<EstadoTemporada>(jsonString).also {
-                println("✅ Partida cargada correctamente desde: $nombreArchivo")
-            }
-        } catch (e: Exception) {
-            println("❌ Error al cargar la partida: ${e.message}")
-            null
-        }
-    }
 }

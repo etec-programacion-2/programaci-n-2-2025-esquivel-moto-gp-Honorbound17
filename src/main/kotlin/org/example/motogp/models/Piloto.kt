@@ -68,13 +68,15 @@ fun crearPilotoExcelente(nombre: String, nacionalidad: Nacionalidad, edad: Int):
 }
 
 fun crearPilotoBueno(nombre: String, nacionalidad: Nacionalidad, edad: Int): Piloto {
-    val habilidad = (70..84).random()
     return Piloto(
         nombre = nombre,
         nacionalidad = nacionalidad,
         edad = edad,
-        habilidad = habilidad,
-        agresividad = (40..70).random(),
-        resistencia = (50..80).random()
+        habilidades = Habilidades(
+            velocidadBase = (70..84).random(),
+            frenadaBase = (60..75).random(),
+            pasoPorCurvaBase = (60..74).random(),
+            rango = RangoHabilidad.B
+        )
     )
 }

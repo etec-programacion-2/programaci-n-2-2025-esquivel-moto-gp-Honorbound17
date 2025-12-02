@@ -6,11 +6,9 @@ import org.example.motogp.models.crearPilotoElite
 import org.example.motogp.models.crearPilotoExcelente
 import org.example.motogp.models.crearPilotoBueno
 import org.example.motogp.simulacion.SimuladorCarreraSimple
-import kotlin.system.exitProcess
+import org.example.motogp.models.format
+import org.example.motogp.models.times
 
-/**
- * PUNTO DE ENTRADA PRINCIPAL DE LA APLICACIÓN
- */
 fun main() {
     println("🏍️".repeat(5) + " MOTOGP LEGACY " + "🏍️".repeat(5))
     println("=" * 50)
@@ -26,10 +24,8 @@ fun main() {
  * Clase que maneja exclusivamente la interfaz de usuario.
  */
 class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.GestionModoCarrera) {
-    
-    /**
-     * BUCLE PRINCIPAL DE LA APLICACIÓN
-     */
+    private val opciones = listOf("Carrera Rápida", "Campeonato", "Contrarreloj", "Salir")
+
     fun ejecutar() {
         var ejecutando = true
         
@@ -41,7 +37,7 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
                 2 -> cargarPartida()
                 3 -> mostrarCreditos()
                 4 -> {
-                    println("👋 ¡Gracias por jugar al MotoGP Simulator!")
+                    println("¡Gracias por jugar al MotoGP Simulator!")
                     ejecutando = false
                 }
             }
@@ -188,17 +184,18 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         println("📂".repeat(25))
 
         print("Nombre de la partida a cargar: ")
-        val nombreArchivo = readln().trim().takeIf { it.isNotBlank() } ?: "partida_guardada"
+        val nombreArchivoInput = readln().trim().takeIf { it.isNotBlank() } ?: "partida_guardada"
+        val nombreArchivo = if (nombreArchivoInput.endsWith(".motojson")) nombreArchivoInput else "$nombreArchivoInput.motojson"
         
         println("\n⏳ Cargando partida...")
-        val exito = gestorCarrera.cargarPartida(nombreArchivo)
+        val exito = gestorCarrera.cargarProgreso(nombreArchivo)
         
         if (exito) {
-            println("✅ Partida cargada exitosamente!")
+            println("Partida cargada exitosamente!")
             menuPartidaEnCurso()
         } else {
-            println("❌ No se pudo cargar la partida '$nombreArchivo'")
-            println("💡 Asegúrate de que el archivo existe y es válido")
+            println("No se pudo cargar la partida '$nombreArchivo'")
+            println("Asegúrate de que el archivo existe y es válido")
         }
     }
     
@@ -296,8 +293,9 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         if (clasificacion.isEmpty()) {
             println("No hay datos de clasificación disponibles")
         } else {
-            opciones.withIndex().forEach { (index, opcion) ->
+            clasificacion.entries.withIndex().forEach { (index, entry) ->
                 val posicion = index + 1
+                val (piloto, puntos) = entry
                 val emoji = when (posicion) {
                     1 -> "🥇"
                     2 -> "🥈" 
@@ -315,13 +313,14 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
      */
     private fun guardarPartidaActual() {
         print("\n💾 Nombre para guardar la partida: ")
-        val nombreArchivo = readln().trim().takeIf { it.isNotBlank() } ?: "partida_guardada"
+        val nombreArchivoInput = readln().trim().takeIf { it.isNotBlank() } ?: "partida_guardada"
+        val nombreArchivo = if (nombreArchivoInput.endsWith(".motojson")) nombreArchivoInput else "$nombreArchivoInput.motojson"
         
-        val exito = gestorCarrera.guardarPartida(nombreArchivo)
+        val exito = gestorCarrera.guardarProgreso(nombreArchivo)
         if (exito) {
-            println("✅ Partida guardada como '$nombreArchivo.motojson'")
+            println("Partida guardada como '$nombreArchivo'")
         } else {
-            println("❌ Error al guardar la partida")
+            println("Error al guardar la partida")
         }
     }
     
@@ -342,7 +341,7 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         println("\n" + "⭐".repeat(25))
         println("         CRÉDITOS")
         println("⭐".repeat(25))
-        println("🏍️  MotoGP Simulator")
+        println("🏍️  MotoGP Legacy")
         println("🎮 Desarrollado con Kotlin")
         println("💡 Arquitectura: Patrón Fachada")
         println("📊 Simulador: Sistema de rangos S-A-B-C-D")
@@ -362,17 +361,11 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
                 if (input in min..max) {
                     return input
                 } else {
-                    println("❌ Por favor, introduce un número entre $min y $max: ")
+                    println("Por favor, introduce un número entre $min y $max: ")
                 }
             } catch (e: NumberFormatException) {
-                println("❌ Entrada inválida. Por favor, introduce un número: ")
+                println("Entrada inválida. Por favor, introduce un número: ")
             }
         }
     }
 }
-
-// Función de extensión para formatear números
-fun Double.format(digits: Int) = "%.${digits}f".format(this)
-
-// Función de extensión para repetir strings (útil para separadores)
-operator fun String.times(n: Int) = this.repeat(n)

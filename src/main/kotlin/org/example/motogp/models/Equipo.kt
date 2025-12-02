@@ -1,12 +1,11 @@
 package org.example.motogp.models
 
+import org.example.motogp.enums.FabricanteMoto
 /**
  * Clase que representa un equipo de MotoGP.
  * @property nombre Nombre del equipo
  * @property moto Moto oficial del equipo
  * @property pilotos Lista de pilotos del equipo (máximo 2)
- * 
- * Objetivo de aprendizaje: Composición y manejo de colecciones
  */
 class Equipo(
     val nombre: String,
