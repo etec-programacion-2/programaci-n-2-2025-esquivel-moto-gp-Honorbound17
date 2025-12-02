@@ -1,0 +1,15 @@
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/enums/Nacionalidad.kt
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/models/Equipo.kt
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/models/Rendimiento.kt
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/partidas/EstadoTemporada.kt
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/enums/FabricanteMoto.kt
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/models/Piloto.kt
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/Main.kt
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/simulacion/SimuladorSimple.kt
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/carrera/GestionModoCarrera.kt
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/models/Circuito.kt
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/models/Habilidades.kt
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/models/Moto.kt
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/carrera/ModoCarreraManager.kt
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/simulacion/SimuladorCarrera.kt
+/home/etec/programaci-n-2-2025-esquivel-moto-gp-Honorbound17/src/main/kotlin/org/example/motogp/enums/RangoHabilidad.kt

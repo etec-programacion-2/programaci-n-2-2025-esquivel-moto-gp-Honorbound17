@@ -15,9 +15,9 @@ import org.example.motogp.enums.Nacionalidad
 data class Circuito(
     val nombre: String,
     val pais: Nacionalidad,
-    val longitud: Double, // en metros
+    val longitud: Double,
     val curvas: Int,
-    val rectaPrincipal: Double, // en metros
+    val rectaPrincipal: Double,
     val dificultad: Int
 ) {
     init {
@@ -45,12 +45,12 @@ data class Circuito(
 
 // Circuitos famosos de MotoGP
 val CIRCUITO_JEREZ = Circuito(
-    nombre = "Circuito de Jerez-Ángel Nieto",
-    pais = Nacionalidad.ESPANA,
-    longitud = 4423.0,
+    nombre = "Circuito de Jerez",
+    pais = Nacionalidad.ESPAÑA,
+    longitud = 4.423,
     curvas = 13,
-    rectaPrincipal = 607.0,
-    dificultad = 85
+    dificultad = 7,
+    rectaPrincipal = 600.0
 )
 
 val CIRCUITO_MUGELO = Circuito(

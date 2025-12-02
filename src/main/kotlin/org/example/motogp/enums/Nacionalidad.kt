@@ -5,14 +5,16 @@ package org.example.motogp.enums
  * @brief Representa las nacionalidades de los pilotos.
  */
 enum class Nacionalidad {
-    ESPANA,     // España
-    ITALIA,     // Italia
-    FRANCIA,    // Francia
-    ALEMANIA,   // Alemania
-    PORTUGAL,   // Portugal
-    USA,        // Estados Unidos
-    ARGENTINA,  // Argentina
-    JAPON,      // Japón
-    AUSTRALIA,  // Australia
-    BRASIL      // Brasil
+    ESPAÑA,
+    ITALIA,
+    FRANCIA,
+    ALEMANIA,
+    PORTUGAL,
+    USA,
+    ARGENTINA,
+    HOLANDA,
+    JAPON,
+    AUSTRALIA,
+    REINO_UNIDO,
+    BRASIL
 }

@@ -6,12 +6,23 @@ import org.example.motogp.models.Equipo
 import org.example.motogp.models.crearEquipoDucatiLenovo
 import org.example.motogp.models.crearEquipoRepsolHonda
 import org.example.motogp.models.crearEquipoYamaha
+import org.example.motogp.models.crearPilotoElite
+import org.example.motogp.models.crearPilotoExcelente
+import org.example.motogp.models.crearPilotoBueno
+import org.example.motogp.enums.Nacionalidad
+import org.example.motogp.constants.CircuitosConstants
 import org.example.motogp.simulacion.ResultadoCarrera
 import org.example.motogp.simulacion.SimuladorCarrera
 import org.example.motogp.simulacion.SimuladorCarreraSimple
 import kotlin.random.Random
 
-
+/**
+ * Implementación del gestor del modo carrera.
+ *
+ * Notas importantes:
+ * - La persistencia se hace mediante EstadoTemporadaSerializable + GestorArchivos
+ *   para evitar la serialización directa del grafo de objetos de dominio.
+ */
 class ModoCarreraManager(
     private val simulador: SimuladorCarrera = SimuladorCarreraSimple()
 ) : GestionModoCarrera {
@@ -78,7 +89,10 @@ class ModoCarreraManager(
         
         // Calendario con número específico de carreras
         val circuitosDisponibles = listOf(
-            CIRCUITO_JEREZ, CIRCUITO_MUGELO, CIRCUITO_ASSEN, CIRCUITO_SILVERSTONE
+            org.example.motogp.models.CIRCUITO_JEREZ,
+            org.example.motogp.models.CIRCUITO_MUGELO,
+            org.example.motogp.models.CIRCUITO_ASSEN, 
+            org.example.motogp.models.CIRCUITO_SILVERSTONE
         )
         
         calendario.clear()
@@ -240,146 +254,99 @@ class ModoCarreraManager(
         return estado.carreraActual > calendario.size
     }
     
+    /**
+     * Guarda el progreso actual usando EstadoTemporadaSerializable + GestorArchivos.
+     * Retorna true si se guardó correctamente.
+     */
     override fun guardarProgreso(nombreArchivo: String): Boolean {
-        println("💾 Guardando progreso en '$nombreArchivo' (simulado)")
-        return true
-    }
-    
-    override fun cargarProgreso(nombreArchivo: String): Boolean {
-        println("📂 Cargando progreso desde '$nombreArchivo' (simulado)")
-        return true
-    }
-    
-    override fun finalizarTemporada(): String {
-        val estado = estadoTemporada ?: throw IllegalStateException("No hay temporada en curso")
-        
-        val ganador = obtenerClasificacionGeneral().entries.firstOrNull()
-        val ganadorConstructores = obtenerClasificacionConstructores().entries.firstOrNull()
-        
-        val resumen = """
-        🏆 TEMPORADA FINALIZADA 🏆
-        
-        🥇 Campeón de Pilotos: ${ganador?.key?.nombre ?: "N/A"} - ${ganador?.value ?: 0} puntos
-        🏍️  Campeón de Constructores: ${ganadorConstructores?.key ?: "N/A"} - ${ganadorConstructores?.value ?: 0} puntos
-        
-        📊 Posición del jugador: ${estado.obtenerPosicionJugador()}
-        📈 Puntos del jugador: ${puntosPilotos[pilotoJugador] ?: 0}
-        
-        🏁 Carreras disputadas: ${historialCarreras.size}
-        """.trimIndent()
-        
-        // Limpiar estado
-        estadoTemporada = null
-        pilotoJugador = null
-        
-        return resumen
-    }
-    
-    override fun guardarPartida(fichero: String): Boolean {
         val estado = estadoTemporada ?: return false
-        val piloto = pilotoJugador ?: return false
-    
         try {
-            // Crear estado serializable
-            val estadoSerializable = EstadoTemporadaSerializable(
-                nombrePilotoJugador = piloto.nombre,
-                nacionalidadPiloto = piloto.nacionalidad.name,
-                edadPiloto = piloto.edad,
+            val nombre = if (nombreArchivo.endsWith(".motojson")) nombreArchivo else "$nombreArchivo.motojson"
+            val serializable = EstadoTemporadaSerializable(
+                nombrePilotoJugador = estado.pilotoJugador.nombre,
+                nacionalidadPiloto = estado.pilotoJugador.nacionalidad.name,
+                edadPiloto = estado.pilotoJugador.edad,
                 carreraActual = estado.carreraActual,
                 totalCarreras = estado.totalCarreras,
-                puntosPilotos = puntosPilotos.mapKeys { it.key.nombre },
-                puntosEquipos = puntosEquipos,
-                nombresCircuitos = calendario.map { it.nombre },
-                dificultad = dificultad,
-                historialCarreras = historialCarreras.size
+                puntosPilotos = estado.puntosPilotos.mapKeys { it.key.nombre },
+                puntosEquipos = estado.puntosEquipos,
+                nombresCircuitos = estado.calendario.map { it.nombre },
+                dificultad = estado.dificultad,
+                historialCarreras = estado.historialCarreras.size
             )
-        
-            // Convertir a JSON y guardar
-            val json = estadoSerializable.toJson()
-            val archivoCompleto = if (fichero.endsWith(".motojson")) fichero else "$fichero.motojson"
-        
-            val exito = GestorArchivos.guardarString(json, archivoCompleto)
-        
-            if (exito) {
-                println("💾 Partida guardada correctamente: $archivoCompleto")
-                println("📊 Progreso: ${estado.carreraActual - 1}/${estado.totalCarreras} carreras")
-            } else {
-                println("❌ Error al guardar la partida")
-            }
-        
-            return exito
+            return GestorArchivos.guardarString(serializable.toJson(), nombre)
         } catch (e: Exception) {
-            println("❌ Error en guardado: ${e.message}")
+            println("❌ Error al guardar progreso: ${e.message}")
             return false
         }
     }
-
-    override fun cargarPartida(fichero: String): Boolean {
+    
+    /**
+     * Carga un progreso previamente guardado y reconstruye un estado mínimo.
+     * No intenta restaurar exactamente las instancias originales (equipos/pilotos completos),
+     * pero recrea pilotos y calendario para que la temporada pueda continuar.
+     */
+    override fun cargarProgreso(nombreArchivo: String): Boolean {
         try {
-            val archivoCompleto = if (fichero.endsWith(".motojson")) fichero else "$fichero.motojson"
-            val json = GestorArchivos.cargarString(archivoCompleto) ?: return false
-        
-            // Deserializar
-            val estadoSerializable = EstadoTemporadaSerializable.fromJson(json)
-        
+            val nombre = if (nombreArchivo.endsWith(".motojson")) nombreArchivo else "$nombreArchivo.motojson"
+            val json = GestorArchivos.cargarString(nombre) ?: return false
+            val s = EstadoTemporadaSerializable.fromJson(json)
+            
             // Reconstruir piloto jugador
-            val nacionalidad = enumValueOf<Nacionalidad>(estadoSerializable.nacionalidadPiloto)
-            val pilotoJugadorCargado = crearPilotoElite(
-                estadoSerializable.nombrePilotoJugador,
-                nacionalidad,
-                estadoSerializable.edadPiloto
+            val nacionalidad = try { Nacionalidad.valueOf(s.nacionalidadPiloto) } catch (e: Exception) { Nacionalidad.ESPAÑA }
+            val piloto = crearPilotoBueno(s.nombrePilotoJugador, nacionalidad, s.edadPiloto)
+            
+            // Reconstruir calendario con circuitos conocidos, o fallback aleatorio
+            val conocidos = listOf(
+                org.example.motogp.models.CIRCUITO_JEREZ,
+                org.example.motogp.models.CIRCUITO_MUGELO,
+                org.example.motogp.models.CIRCUITO_ASSEN,
+                org.example.motogp.models.CIRCUITO_SILVERSTONE
             )
-        
-            // Reconstruir calendario
-            val calendarioCargado = estadoSerializable.nombresCircuitos.map { nombreCircuito ->
-                when (nombreCircuito) {
-                    "Circuito de Jerez-Ángel Nieto" -> CIRCUITO_JEREZ
-                    "Mugello Circuit" -> CIRCUITO_MUGELO
-                    "TT Circuit Assen" -> CIRCUITO_ASSEN
-                    "Silverstone Circuit" -> CIRCUITO_SILVERSTONE
-                    else -> CIRCUITO_JEREZ // Por defecto
-                }
+            val calendarioReconstruido = s.nombresCircuitos.map { nombreCircuito ->
+                conocidos.find { it.nombre == nombreCircuito } ?: conocidos.random()
             }
-        
-            // Reconstruir puntos de pilotos (simplificado - solo guardamos nombres)
-            val puntosPilotosCargados = mutableMapOf<Piloto, Int>()
-            puntosPilotosCargados[pilotoJugadorCargado] = estadoSerializable.puntosPilotos[estadoSerializable.nombrePilotoJugador] ?: 0
-        
-            // Reconstruir estado
-            this.pilotoJugador = pilotoJugadorCargado
-            this.dificultad = estadoSerializable.dificultad
-            this.calendario.clear()
-            this.calendario.addAll(calendarioCargado)
-            this.puntosPilotos.clear()
-            this.puntosPilotos.putAll(puntosPilotosCargados)
-            this.puntosEquipos.clear()
-            this.puntosEquipos.putAll(estadoSerializable.puntosEquipos)
-        
-            this.estadoTemporada = EstadoTemporada(
-                pilotoJugador = pilotoJugadorCargado,
-                carreraActual = estadoSerializable.carreraActual,
-                totalCarreras = estadoSerializable.totalCarreras,
-                puntosPilotos = puntosPilotosCargados,
-                puntosEquipos = estadoSerializable.puntosEquipos,
-                calendario = calendarioCargado,
-                dificultad = estadoSerializable.dificultad
+            
+            // Reconstruir mapa de pilotos desde nombres (usamos factories simples)
+            val puntosPilotosReconstruidos: MutableMap<Piloto, Int> = mutableMapOf()
+            s.puntosPilotos.forEach { (nombrePiloto, puntos) ->
+                // Si coincide con el jugador, usar la instancia creada previamente
+                val p = if (nombrePiloto == s.nombrePilotoJugador) piloto
+                        else crearPilotoBueno(nombrePiloto, Nacionalidad.ESPAÑA, 25)
+                puntosPilotosReconstruidos[p] = puntos
+            }
+            
+            // Reconstruir puntos de equipos (se mantienen por nombre)
+            val puntosEquiposReconstruidos = s.puntosEquipos.toMutableMap()
+            
+            // Asignar estado reconstruido
+            estadoTemporada = EstadoTemporada(
+                pilotoJugador = piloto,
+                carreraActual = s.carreraActual,
+                totalCarreras = s.totalCarreras,
+                puntosPilotos = puntosPilotosReconstruidos.toMap(),
+                puntosEquipos = puntosEquiposReconstruidos.toMap(),
+                calendario = calendarioReconstruido,
+                dificultad = s.dificultad,
+                historialCarreras = emptyList()
             )
-        
-            // Re-inicializar equipos y pilotos CPU
-            inicializarEquiposYCalendario()
-        
-            println("📂 Partida cargada correctamente: $archivoCompleto")
-            println("🎯 Piloto: ${pilotoJugadorCargado.nombre}")
-            println("📊 Progreso: ${estadoSerializable.carreraActual - 1}/${estadoSerializable.totalCarreras} carreras")
-            println("🏆 Puntos: ${puntosPilotosCargados[pilotoJugadorCargado] ?: 0}")
-        
+            
+            // Actualizar estructuras internas (mutable) para que el manager pueda continuar
+            puntosPilotos.clear()
+            puntosPilotos.putAll(puntosPilotosReconstruidos)
+            puntosEquipos.clear()
+            puntosEquipos.putAll(puntosEquiposReconstruidos)
+            pilotosCPU.clear() // no restauramos pilotos CPU ahora
+            pilotoJugador = piloto
+            
+            println("✅ Partida cargada correctamente desde: $nombre")
             return true
         } catch (e: Exception) {
-            println("❌ Error al cargar partida: ${e.message}")
+            println("❌ Error al cargar progreso: ${e.message}")
             return false
         }
     }
-
+    
     fun listarPartidasGuardadas(): List<String> {
         return GestorArchivos.listarPartidasGuardadas()
     }
@@ -404,7 +371,7 @@ class ModoCarreraManager(
             crearPilotoExcelente("Enea Bastianini", Nacionalidad.ITALIA, 25).apply { 
                 equipos[0].ficharPiloto(this) 
             },
-            crearPilotoElite("Marc Márquez", Nacionalidad.ESPANA, 30).apply { 
+            crearPilotoElite("Marc Márquez", Nacionalidad.ESPAÑA, 30).apply { 
                 equipos[1].ficharPiloto(this) 
             },
             crearPilotoExcelente("Fabio Quartararo", Nacionalidad.FRANCIA, 24).apply { 

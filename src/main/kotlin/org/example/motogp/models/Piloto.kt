@@ -16,7 +16,7 @@ data class Piloto(
     val nombre: String,
     val nacionalidad: Nacionalidad,
     val edad: Int,
-    val habilidades: Habilidades
+    val habilidades: Habilidades,
     val equipo: Equipo? = null
 ) {
     init {
@@ -63,6 +63,20 @@ fun crearPilotoExcelente(nombre: String, nacionalidad: Nacionalidad, edad: Int):
             frenadaBase = (75..85).random(),
             pasoPorCurvaBase = (85..95).random(),
             rango = RangoHabilidad.A
+        )
+    )
+}
+
+fun crearPilotoBueno(nombre: String, nacionalidad: Nacionalidad, edad: Int): Piloto {
+    return Piloto(
+        nombre = nombre,
+        nacionalidad = nacionalidad,
+        edad = edad,
+        habilidades = Habilidades(
+            velocidadBase = (70..84).random(),
+            frenadaBase = (60..75).random(),
+            pasoPorCurvaBase = (60..74).random(),
+            rango = RangoHabilidad.B
         )
     )
 }

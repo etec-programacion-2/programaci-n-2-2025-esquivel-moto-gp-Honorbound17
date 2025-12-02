@@ -1,5 +1,8 @@
 package org.example.motogp
 
+import kotlin.test.assertFalse
+import kotlin.test.assertNull
+import java.io.File
 import org.example.motogp.enums.FabricanteMoto
 import org.example.motogp.enums.Nacionalidad
 import org.example.motogp.enums.RangoHabilidad
@@ -307,7 +310,7 @@ class AppTest {
         private var temporadaIniciada = false
     
         override fun iniciarNuevaCarrera(pilotoJugador: Piloto, dificultad: Int) {
-            emporadaIniciada = true
+            temporadaIniciada = true
         }
     
         override fun configurarTemporada(numeroCarreras: Int, equiposParticipantes: List<String>) {
@@ -501,7 +504,7 @@ class AppTest {
     }
 
     @Test fun testInterfazUsuarioCreacion() {
-        al gestor = ModoCarreraManager()
+        val gestor = ModoCarreraManager()
         val interfaz = InterfazUsuario(gestor)
     
         // Verificar creación
