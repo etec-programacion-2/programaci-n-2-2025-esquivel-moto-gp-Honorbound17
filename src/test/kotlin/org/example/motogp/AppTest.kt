@@ -1,58 +1,53 @@
 package org.example.motogp
 
-import kotlin.test.assertFalse
-import kotlin.test.assertNull
+import kotlin.test.*
 import java.io.File
+
+// Enums
 import org.example.motogp.enums.FabricanteMoto
 import org.example.motogp.enums.Nacionalidad
 import org.example.motogp.enums.RangoHabilidad
-import org.example.motogp.models.Habilidades
-import org.example.motogp.models.Moto
-import org.example.motogp.models.Piloto
-import org.example.motogp.models.Rendimiento
-import org.example.motogp.simulacion.SimuladorCarrera
-import org.example.motogp.simulacion.SimuladorCarreraSimple
-import org.example.motogp.simulacion.ResultadoCarrera
-import org.example.motogp.carrera.GestionModoCarrera
-import org.example.motogp.carrera.ModoCarreraManager
-import org.example.motogp.carrera.SistemaPuntos
-import org.example.motogp.carrera.EstadoTemporadaSerializable
-import org.example.motogp.carrera.GestorArchivos
-import kotlin.test.Test
-import kotlin.test.assertNotNull
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import kotlin.test.assertFailsWith
+
+// Modelos y fábricas
+import org.example.motogp.models.*
+
+// Simulación
+import org.example.motogp.simulacion.*
+
+// Modo carrera / persistencia
+import org.example.motogp.carrera.*
 
 class AppTest {
-    
-    @Test fun testCreacionPilotoValido() {
+
+    @Test
+    fun testCreacionPilotoValido() {
         val habilidades = Habilidades(
             velocidadBase = 95,
             frenadaBase = 88,
             pasoPorCurvaBase = 92,
             rango = RangoHabilidad.S
         )
-        
+
         val piloto = Piloto(
             nombre = "Marc Márquez",
             nacionalidad = Nacionalidad.ESPANA,
             edad = 30,
             habilidades = habilidades
         )
-        
+
         assertNotNull(piloto, "El piloto debería crearse correctamente")
         assertNotNull(piloto.habilidades, "Las habilidades deberían existir")
     }
-    
-    @Test fun testValidacionEdadMinima() {
+
+    @Test
+    fun testValidacionEdadMinima() {
         val habilidades = Habilidades(
             velocidadBase = 80,
             frenadaBase = 75,
             pasoPorCurvaBase = 70,
             rango = RangoHabilidad.A
         )
-        
+
         assertFailsWith<IllegalArgumentException> {
             Piloto(
                 nombre = "Piloto Joven",
@@ -62,26 +57,28 @@ class AppTest {
             )
         }
     }
-    
-    @Test fun testCreacionMotoValida() {
+
+    @Test
+    fun testCreacionMotoValida() {
         val rendimiento = Rendimiento(
             velocidadMaxima = 95,
             aceleracion = 88,
             maniobrabilidad = 85
         )
-        
+
         val moto = Moto(
             fabricante = FabricanteMoto.DUCATI,
             modelo = "Desmosedici GP24",
             rendimiento = rendimiento
         )
-        
+
         assertNotNull(moto, "La moto debería crearse correctamente")
         assertNotNull(moto.rendimiento, "El rendimiento debería existir")
         assertEquals("Ducati", moto.marca)
     }
-    
-    @Test fun testValidacionRendimiento() {
+
+    @Test
+    fun testValidacionRendimiento() {
         assertFailsWith<IllegalArgumentException> {
             Rendimiento(
                 velocidadMaxima = 150,  // Inválido
@@ -90,106 +87,115 @@ class AppTest {
             )
         }
     }
-    
-    @Test fun testPuntajeTotalRendimiento() {
+
+    @Test
+    fun testPuntajeTotalRendimiento() {
         val rendimiento = Rendimiento(
             velocidadMaxima = 90,
             aceleracion = 85,
             maniobrabilidad = 80
         )
-        
+
         assertEquals(255, rendimiento.puntajeTotal())
         assertEquals(85.0, rendimiento.promedio())
     }
 
-    @Test fun testCreacionEquipo() {
+    @Test
+    fun testCreacionEquipo() {
         val moto = crearMotoDucatiGP24()
         val equipo = Equipo("Ducati Team", moto)
-    
+
         assertNotNull(equipo)
         assertEquals("Ducati Team", equipo.nombre)
         assertEquals(0, equipo.numeroPilotos())
     }
 
-    @Test fun testFicharPiloto() {
+    @Test
+    fun testFicharPiloto() {
         val equipo = crearEquipoDucatiLenovo()
         val piloto = crearPilotoElite("Francesco Bagnaia", Nacionalidad.ITALIA, 26)
-    
+
         equipo.ficharPiloto(piloto)
-    
+
         assertEquals(1, equipo.numeroPilotos())
         assertEquals("Francesco Bagnaia", equipo.obtenerPilotoPrincipal()?.nombre)
     }
 
-    @Test fun testFicharPilotoEquipoCompleto() {
+    @Test
+    fun testFicharPilotoEquipoCompleto() {
         val equipo = crearEquipoRepsolHonda()
         val piloto1 = crearPilotoElite("Marc Márquez", Nacionalidad.ESPANA, 30)
         val piloto2 = crearPilotoExcelente("Joan Mir", Nacionalidad.ESPANA, 26)
         val piloto3 = crearPilotoBueno("Test Piloto", Nacionalidad.USA, 25)
-    
+
         // Fichar dos pilotos (máximo permitido)
         equipo.ficharPiloto(piloto1)
         equipo.ficharPiloto(piloto2)
-    
+
         assertTrue(equipo.estaCompleto())
-    
+
         // Intentar fichar un tercer piloto debería fallar
         assertFailsWith<IllegalStateException> {
             equipo.ficharPiloto(piloto3)
         }
     }
 
-    @Test fun testDarDeBajaPiloto() {
+    @Test
+    fun testDarDeBajaPiloto() {
         val equipo = crearEquipoYamaha()
         val piloto = crearPilotoExcelente("Fabio Quartararo", Nacionalidad.FRANCIA, 24)
-    
+
         equipo.ficharPiloto(piloto)
         assertEquals(1, equipo.numeroPilotos())
-    
+
         val eliminado = equipo.darDeBajaPiloto(piloto)
         assertTrue(eliminado)
         assertEquals(0, equipo.numeroPilotos())
     }
 
-    @Test fun testObtenerRendimientoMedio() {
+    @Test
+    fun testObtenerRendimientoMedio() {
         val equipo = crearEquipoDucatiLenovo()
         val piloto = crearPilotoElite("Francesco Bagnaia", Nacionalidad.ITALIA, 26)
-    
+
         equipo.ficharPiloto(piloto)
-    
+
         val rendimiento = equipo.obtenerRendimientoMedio()
         assertTrue(rendimiento > 0.0, "El rendimiento debería ser mayor a 0")
         assertTrue(rendimiento <= 100.0, "El rendimiento debería ser menor o igual a 100")
     }
 
-    @Test fun testEquipoSinPilotos() {
+    @Test
+    fun testEquipoSinPilotos() {
         val equipo = crearEquipoRepsolHonda()
-    
+
         assertEquals(0, equipo.numeroPilotos())
         assertFalse(equipo.estaCompleto())
         assertNull(equipo.obtenerPilotoPrincipal())
     }
 
-    @Test fun testResultadoCarrera() {
+    @Test
+    fun testResultadoCarrera() {
         val piloto1 = crearPilotoElite("Piloto 1", Nacionalidad.ESPANA, 25)
         val piloto2 = crearPilotoExcelente("Piloto 2", Nacionalidad.ITALIA, 26)
         val piloto3 = crearPilotoBueno("Piloto 3", Nacionalidad.FRANCIA, 27)
-    
+
         val resultado = ResultadoCarrera(
             posiciones = listOf(piloto1, piloto2, piloto3),
             vueltasRapidas = mapOf(piloto1 to 89.456),
             abandonos = emptyList()
         )
-    
+
         assertEquals(piloto1, resultado.obtenerGanador())
         assertEquals(3, resultado.obtenerPodio().size)
         assertEquals(1, resultado.obtenerPosicion(piloto1))
         assertTrue(resultado.pilotoEnPuntos(piloto1))
     }
 
-    @Test fun testCircuitoCreacion() {
+    @Test
+    fun testCircuitoCreacion() {
         val circuito = CIRCUITO_JEREZ
-    
+
         assertNotNull(circuito)
         assertEquals("Circuito de Jerez-Ángel Nieto", circuito.nombre)
         assertEquals(Nacionalidad.ESPANA, circuito.pais)
@@ -203,83 +209,89 @@ class AppTest {
         }
     }
 
-    @Test fun testInterfazSimulador() {
+    @Test
+    fun testInterfazSimulador() {
         val simuladorMock = SimuladorMock()
         val pilotos = listOf(
             crearPilotoElite("Piloto A", Nacionalidad.ESPANA, 25),
             crearPilotoExcelente("Piloto B", Nacionalidad.ITALIA, 26)
         )
-    
+
         val resultado = simuladorMock.simular(pilotos, CIRCUITO_MUGELO)
-    
+
         assertEquals(2, resultado.posiciones.size)
         assertEquals("Piloto B", resultado.obtenerGanador().nombre)
     }
 
-    @Test fun testSimuladorCarreraSimple() {
+    @Test
+    fun testSimuladorCarreraSimple() {
         val simulador = SimuladorCarreraSimple()
-    
+
         val pilotos = listOf(
             crearPilotoElite("Marc Márquez", Nacionalidad.ESPANA, 30),
             crearPilotoExcelente("Fabio Quartararo", Nacionalidad.FRANCIA, 24),
             crearPilotoBueno("Jack Miller", Nacionalidad.AUSTRALIA, 28)
         )
-    
+
         val resultado = simulador.simular(pilotos, CIRCUITO_JEREZ)
-    
+
         assertEquals(3, resultado.posiciones.size)
         assertTrue(resultado.posiciones.isNotEmpty())
         // Verificar que todos los pilotos están en el resultado (pueden estar en diferente orden)
         assertEquals(pilotos.toSet(), resultado.posiciones.toSet())
     }
 
-    @Test fun testSimuladorConMenosDe2Pilotos() {
+    @Test
+    fun testSimuladorConMenosDe2Pilotos() {
         val simulador = SimuladorCarreraSimple()
         val pilotoUnico = listOf(crearPilotoElite("Solo Piloto", Nacionalidad.ESPANA, 25))
-    
-            assertFailsWith<IllegalArgumentException> {
+
+        assertFailsWith<IllegalArgumentException> {
             simulador.simular(pilotoUnico, CIRCUITO_MUGELO)
         }
     }
 
-    @Test fun testSimuladorConPesosPersonalizados() {
+    @Test
+    fun testSimuladorConPesosPersonalizados() {
         val simulador = SimuladorCarreraSimple()
-    
+
         val pilotos = listOf(
             crearPilotoElite("Piloto Elite", Nacionalidad.ESPANA, 25),
             crearPilotoBueno("Piloto Bueno", Nacionalidad.ITALIA, 26)
         )
-    
+
         val resultado = simulador.simularConPesos(
             pilotos = pilotos,
             circuito = CIRCUITO_ASSEN,
             pesoHabilidades = 0.7,
             pesoMoto = 0.3
         )
-    
+
         assertEquals(2, resultado.posiciones.size)
         assertTrue(resultado.obtenerGanador() in pilotos)
     }
 
-    @Test fun testResultadoEsDiferenteCadaVez() {
+    @Test
+    fun testResultadoEsDiferenteCadaVez() {
         val simulador = SimuladorCarreraSimple()
-    
+
         val pilotos = listOf(
             crearPilotoElite("Piloto A", Nacionalidad.ESPANA, 25),
             crearPilotoElite("Piloto B", Nacionalidad.ITALIA, 26),
             crearPilotoElite("Piloto C", Nacionalidad.FRANCIA, 27)
         )
-    
+
         val resultado1 = simulador.simular(pilotos, CIRCUITO_JEREZ)
         val resultado2 = simulador.simular(pilotos, CIRCUITO_JEREZ)
-    
+
         // Los resultados pueden ser diferentes debido al factor aleatorio
         // Pero deben contener los mismos pilotos
         assertEquals(pilotos.toSet(), resultado1.posiciones.toSet())
         assertEquals(pilotos.toSet(), resultado2.posiciones.toSet())
     }
 
-    @Test fun testSistemaPuntos() {
+    @Test
+    fun testSistemaPuntos() {
         assertEquals(25, SistemaPuntos.obtenerPuntos(1))
         assertEquals(20, SistemaPuntos.obtenerPuntos(2))
         assertEquals(1, SistemaPuntos.obtenerPuntos(15))
@@ -287,7 +299,8 @@ class AppTest {
         assertEquals(0, SistemaPuntos.obtenerPuntos(0))
     }
 
-    @Test fun testEstadoTemporada() {
+    @Test
+    fun testEstadoTemporada() {
         val piloto = crearPilotoElite("Jugador", Nacionalidad.ESPANA, 25)
         val estado = EstadoTemporada(
             pilotoJugador = piloto,
@@ -298,7 +311,7 @@ class AppTest {
             calendario = listOf(CIRCUITO_JEREZ, CIRCUITO_MUGELO),
             dificultad = 75
         )
-    
+
         assertEquals(5, estado.carreraActual)
         assertEquals(20, estado.totalCarreras)
         assertEquals(1, estado.obtenerPosicionJugador())
@@ -308,155 +321,161 @@ class AppTest {
     // Mock para testing de la interfaz
     class GestionModoCarreraMock : GestionModoCarrera {
         private var temporadaIniciada = false
-    
+
         override fun iniciarNuevaCarrera(pilotoJugador: Piloto, dificultad: Int) {
             temporadaIniciada = true
         }
-    
+
         override fun configurarTemporada(numeroCarreras: Int, equiposParticipantes: List<String>) {
             // Mock implementation
         }
-    
+
         override fun simularSiguienteCarrera(): ResultadoCarrera {
             return ResultadoCarrera(emptyList())
         }
-    
+
         override fun avanzarSiguienteEvento() {
             // Mock implementation
         }
-    
+
         override fun simularCarreraPersonalizada(circuito: Circuito, pilotos: List<Piloto>): ResultadoCarrera {
             return ResultadoCarrera(pilotos)
         }
-    
+
         override fun obtenerClasificacionGeneral(): Map<Piloto, Int> {
             return emptyMap()
         }
-    
+
         override fun obtenerEstadoJugador(): String {
             return "Estado mock del jugador"
         }
-    
+
         override fun obtenerClasificacionConstructores(): Map<String, Int> {
             return emptyMap()
         }
-    
+
         override fun obtenerCalendario(): List<Circuito> {
             return emptyList()
         }
-    
+
         override fun obtenerProximaCarrera(): Circuito? {
             return null
         }
-    
+
         override fun obtenerProgresoTemporada(): Pair<Int, Int> {
             return Pair(0, 0)
         }
-    
+
         override fun intentarFichaje(equipoDestino: String): Boolean {
             return false
         }
-    
+
         override fun mejorarHabilidad(tipoHabilidad: String, puntos: Int): Boolean {
             return false
         }
-    
+
         override fun obtenerEquiposDisponibles(): List<String> {
             return emptyList()
         }
-    
+
         override fun temporadaEnCurso(): Boolean {
             return temporadaIniciada
         }
-    
+
         override fun temporadaFinalizada(): Boolean {
             return false
         }
-    
+
         override fun guardarProgreso(nombreArchivo: String): Boolean {
             return true
         }
-    
+
         override fun cargarProgreso(nombreArchivo: String): Boolean {
             return true
         }
-    
+
         override fun finalizarTemporada(): String {
             return "Resumen mock de temporada"
         }
     }
 
-    @Test fun testInterfazGestionModoCarrera() {
+    @Test
+    fun testInterfazGestionModoCarrera() {
         val gestion = GestionModoCarreraMock()
         val piloto = crearPilotoElite("Jugador Test", Nacionalidad.ESPANA, 25)
-    
+
         // Test de inicio de temporada
         gestion.iniciarNuevaCarrera(piloto, 75)
         assertTrue(gestion.temporadaEnCurso())
-    
+
         // Test de métodos de consulta
         assertNotNull(gestion.obtenerEstadoJugador())
         assertNotNull(gestion.obtenerClasificacionGeneral())
         assertNotNull(gestion.obtenerCalendario())
     }
 
-    @Test fun testModoCarreraManagerInicializacion() {
+    @Test
+    fun testModoCarreraManagerInicializacion() {
         val manager = ModoCarreraManager()
         val piloto = crearPilotoElite("Jugador Test", Nacionalidad.ESPANA, 25)
-    
+
         // Test de inicialización
         manager.iniciarNuevaCarrera(piloto, 75)
         assertTrue(manager.temporadaEnCurso())
         assertFalse(manager.temporadaFinalizada())
     }
 
-    @Test fun testModoCarreraManagerSimulacion() {
+    @Test
+    fun testModoCarreraManagerSimulacion() {
         val manager = ModoCarreraManager()
         val piloto = crearPilotoElite("Jugador Test", Nacionalidad.ESPANA, 25)
-    
+
         manager.iniciarNuevaCarrera(piloto, 50)
-    
+
         // Simular una carrera
         val resultado = manager.simularSiguienteCarrera()
-    
+
         assertNotNull(resultado)
         assertTrue(resultado.posiciones.isNotEmpty())
         assertTrue(manager.obtenerClasificacionGeneral().isNotEmpty())
     }
 
-    @Test fun testModoCarreraManagerEstado() {
+    @Test
+    fun testModoCarreraManagerEstado() {
         val manager = ModoCarreraManager()
         val piloto = crearPilotoElite("Jugador Test", Nacionalidad.ESPANA, 25)
-    
+
         manager.iniciarNuevaCarrera(piloto, 75)
-    
+
         val estado = manager.obtenerEstadoJugador()
         assertTrue(estado.contains("Jugador Test"))
         assertTrue(estado.contains("Posición"))
-    
+
         val clasificacion = manager.obtenerClasificacionGeneral()
         assertTrue(clasificacion.containsKey(piloto))
     }
 
-    @Test fun testModoCarreraManagerMultiplesCarreras() {
+    @Test
+    fun testModoCarreraManagerMultiplesCarreras() {
         val manager = ModoCarreraManager()
         val piloto = crearPilotoElite("Jugador Test", Nacionalidad.ESPANA, 25)
-    
+
         // Configurar temporada corta para testing
         manager.configurarTemporada(3)
         manager.iniciarNuevaCarrera(piloto, 50)
-    
+
         // Simular múltiples carreras
         repeat(3) {
             val resultado = manager.simularSiguienteCarrera()
             assertNotNull(resultado)
         }
-    
+
         // Verificar que la temporada finalizó
         assertTrue(manager.temporadaFinalizada())
     }
 
-    @Test fun testSerializacionEstadoTemporada() {
+    @Test
+    fun testSerializacionEstadoTemporada() {
         val estado = EstadoTemporadaSerializable(
             nombrePilotoJugador = "Jugador Test",
             nacionalidadPiloto = "ESPANA",
@@ -468,49 +487,52 @@ class AppTest {
             nombresCircuitos = listOf("Jerez", "Mugello"),
             dificultad = 75
         )
-    
+
         // Test serialización
         val json = estado.toJson()
         assertTrue(json.contains("Jugador Test"))
         assertTrue(json.contains("ESPANA"))
-    
+
         // Test deserialización
         val estadoRecuperado = EstadoTemporadaSerializable.fromJson(json)
         assertEquals("Jugador Test", estadoRecuperado.nombrePilotoJugador)
         assertEquals(45, estadoRecuperado.puntosPilotos["Jugador Test"])
     }
 
-    @Test fun testGuardadoYCargaManager() {
+    @Test
+    fun testGuardadoYCargaManager() {
         val manager = ModoCarreraManager()
         val piloto = crearPilotoElite("Jugador Guardado", Nacionalidad.ESPANA, 25)
-    
+
         // Iniciar temporada y simular una carrera
         manager.iniciarNuevaCarrera(piloto, 60)
         manager.simularSiguienteCarrera()
-    
+
         // Guardar partida
         val archivoTest = "test_partida.motojson"
-        val guardadoExitoso = manager.guardarPartida(archivoTest)
+        val guardadoExitoso = manager.guardarProgreso(archivoTest)
         assertTrue(guardadoExitoso)
-    
+
         // Crear nuevo manager y cargar
         val manager2 = ModoCarreraManager()
-        val cargaExitosa = manager2.cargarPartida(archivoTest)
+        val cargaExitosa = manager2.cargarProgreso(archivoTest)
         assertTrue(cargaExitosa)
         assertTrue(manager2.temporadaEnCurso())
-    
+
         // Limpiar archivo de test
         File(archivoTest).delete()
     }
 
-    @Test fun testInterfazUsuarioCreacion() {
+    @Test
+    fun testInterfazUsuarioCreacion() {
         val gestor = ModoCarreraManager()
         val interfaz = InterfazUsuario(gestor)
-    
+
         // Verificar creación
         assertNotNull(interfaz)
     }
 
-    @Test fun testOpcionesMenuValidas() {
+    @Test
+    fun testOpcionesMenuValidas() {
     }
 }

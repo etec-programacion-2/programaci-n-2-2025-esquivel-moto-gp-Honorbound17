@@ -1,0 +1,42 @@
+*📅 Temporada configurada con 5 carreras
+,✅ Nueva temporada iniciada con 5 carreras
+🎯 Piloto: Jugador Test
+⚡ Dificultad: 50
+
+🏁 Simulando carrera 1/5
+.📍 Circuito: Circuito de Jerez-Ángel Nieto
+.✅ Carrera simulada - Ganador: Marc Márquez
+*📅 Temporada configurada con 5 carreras
+,✅ Nueva temporada iniciada con 5 carreras
+🎯 Piloto: Jugador Test
+⚡ Dificultad: 75
+*📅 Temporada configurada con 5 carreras
+,✅ Nueva temporada iniciada con 5 carreras
+🎯 Piloto: Jugador Test
+⚡ Dificultad: 75
+*📅 Temporada configurada con 5 carreras
+,✅ Nueva temporada iniciada con 5 carreras
+🎯 Piloto: Jugador Guardado
+⚡ Dificultad: 60
+
+🏁 Simulando carrera 1/5
+ 📍 Circuito: TT Circuit Assen
+0✅ Carrera simulada - Ganador: Enea Bastianini
+&✅ Guardado en test_partida.motojson
+?✅ Partida cargada correctamente desde: test_partida.motojson
+*📅 Temporada configurada con 3 carreras
+,✅ Nueva temporada iniciada con 3 carreras
+🎯 Piloto: Jugador Test
+⚡ Dificultad: 50
+
+🏁 Simulando carrera 1/3
+📍 Circuito: Mugello Circuit
+2✅ Carrera simulada - Ganador: Francesco Bagnaia
+
+🏁 Simulando carrera 2/3
+📍 Circuito: Mugello Circuit
+-✅ Carrera simulada - Ganador: Jugador Test
+
+🏁 Simulando carrera 3/3
+📍 Circuito: Mugello Circuit
+.✅ Carrera simulada - Ganador: Marc Márquez

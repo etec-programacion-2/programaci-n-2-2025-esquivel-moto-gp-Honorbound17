@@ -1,0 +1,28 @@
+{
+    "nombrePilotoJugador": "Alec Steelhart",
+    "nacionalidadPiloto": "ALEMANIA",
+    "edadPiloto": 22,
+    "carreraActual": 2,
+    "totalCarreras": 5,
+    "puntosPilotos": {
+        "Alec Steelhart": 11,
+        "Fabio Quartararo": 25,
+        "Marc Márquez": 20,
+        "Enea Bastianini": 16,
+        "Francesco Bagnaia": 13
+    },
+    "puntosEquipos": {
+        "Ducati Lenovo Team": 29,
+        "Repsol Honda Team": 20,
+        "Monster Energy Yamaha": 25
+    },
+    "nombresCircuitos": [
+        "TT Circuit Assen",
+        "Circuito de Jerez-Ángel Nieto",
+        "Circuito de Jerez-Ángel Nieto",
+        "Silverstone Circuit",
+        "Mugello Circuit"
+    ],
+    "dificultad": 50,
+    "historialCarreras": 1
+}

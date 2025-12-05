@@ -45,12 +45,12 @@ data class Circuito(
 
 // Circuitos famosos de MotoGP
 val CIRCUITO_JEREZ = Circuito(
-    nombre = "Circuito de Jerez",
-    pais = Nacionalidad.ESPAÑA,
-    longitud = 4.423,
+    nombre = "Circuito de Jerez-Ángel Nieto",
+    pais = Nacionalidad.ESPANA,
+    longitud = 4423.0,
     curvas = 13,
-    dificultad = 7,
-    rectaPrincipal = 600.0
+    rectaPrincipal = 600.0,
+    dificultad = 7
 )
 
 val CIRCUITO_MUGELO = Circuito(
