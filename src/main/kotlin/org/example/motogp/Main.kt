@@ -6,18 +6,30 @@ import org.example.motogp.models.crearPilotoElite
 import org.example.motogp.models.crearPilotoExcelente
 import org.example.motogp.models.crearPilotoBueno
 import org.example.motogp.simulacion.SimuladorCarreraSimple
-import org.example.motogp.models.format
-import org.example.motogp.models.times
+import kotlin.system.exitProcess
 
 fun main() {
     println("🏍️".repeat(5) + " MOTOGP LEGACY " + "🏍️".repeat(5))
     println("=" * 50)
-    
+
     val gestorCarrera = ModoCarreraManager(SimuladorCarreraSimple())
     val interfazUsuario = InterfazUsuario(gestorCarrera)
-    
+
     // Bucle principal de la aplicación
     interfazUsuario.ejecutar()
+}
+
+/**
+ * Función helper para leer una línea de la consola de forma segura.
+ * Si la entrada está cerrada (EOF), muestra mensaje y termina el proceso de forma ordenada.
+ */
+private fun leerLinea(): String {
+    val line = readLine()
+    if (line == null) {
+        println("\n⚠️  Entrada estándar cerrada. Saliendo de la aplicación...")
+        exitProcess(0)
+    }
+    return line
 }
 
 /**
@@ -28,10 +40,10 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
 
     fun ejecutar() {
         var ejecutando = true
-        
+
         while (ejecutando) {
             mostrarMenuPrincipal()
-            
+
             when (obtenerOpcionUsuario(1, 4)) {
                 1 -> iniciarNuevaPartida()
                 2 -> cargarPartida()
@@ -43,7 +55,7 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
             }
         }
     }
-    
+
     /**
      * Muestra el menú principal de la aplicación
      */
@@ -52,13 +64,13 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         println("          MENÚ PRINCIPAL")
         println("🎮".repeat(20))
         println("1. 🆕 Nueva Partida")
-        println("2. 📂 Cargar Partida") 
+        println("2. 📂 Cargar Partida")
         println("3. ℹ️  Créditos")
         println("4. ❌ Salir")
         println("🎮".repeat(20))
         print("Selecciona una opción (1-4): ")
     }
-    
+
     /**
      * Maneja el flujo de creación de una nueva partida
      */
@@ -66,52 +78,52 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         println("\n" + "🚀".repeat(25))
         println("       NUEVA PARTIDA")
         println("🚀".repeat(25))
-        
+
         // Crear piloto jugador
         val pilotoJugador = crearPilotoJugador()
-        
+
         // Configurar dificultad
         val dificultad = configurarDificultad()
-        
+
         // Configurar temporada
         val numeroCarreras = configurarTemporada()
-        
+
         // Iniciar la partida
         gestorCarrera.configurarTemporada(numeroCarreras)
         gestorCarrera.iniciarNuevaCarrera(pilotoJugador, dificultad)
-        
+
         println("\n✅ ¡Partida creada exitosamente!")
         println("👤 Piloto: ${pilotoJugador.nombre}")
         println("📅 Temporada: $numeroCarreras carreras")
         println("⚡ Dificultad: $dificultad/100")
-        
+
         // Entrar al menú de partida en curso
         menuPartidaEnCurso()
     }
-    
+
     /**
      * Crea el piloto del jugador mediante interacción por consola
      */
     private fun crearPilotoJugador(): org.example.motogp.models.Piloto {
         println("\n👤 CREACIÓN DE PILOTO")
         println("-".repeat(25))
-        
+
         print("Nombre de tu piloto: ")
-        val nombre = readln().trim().takeIf { it.isNotBlank() } ?: "Piloto Novato"
-        
+        val nombre = leerLinea().trim().takeIf { it.isNotBlank() } ?: "Piloto Novato"
+
         println("\n🏳️  Selecciona tu nacionalidad:")
         org.example.motogp.enums.Nacionalidad.values().forEachIndexed { index, nacionalidad ->
             println("${index + 1}. ${nacionalidad.name}")
         }
         val nacionalidadIndex = obtenerOpcionUsuario(1, org.example.motogp.enums.Nacionalidad.values().size) - 1
         val nacionalidad = org.example.motogp.enums.Nacionalidad.values()[nacionalidadIndex]
-        
+
         println("\n🎯 Selecciona tu nivel de experiencia:")
         println("1. 🥇 Élite (Rango S) - Para expertos")
-        println("2. 🥈 Profesional (Rango A) - Para jugadores avanzados") 
+        println("2. 🥈 Profesional (Rango A) - Para jugadores avanzados")
         println("3. 🥉 Semiprofesional (Rango B) - Para jugadores intermedios")
         println("4. 🔰 Novato (Rango C) - Para principiantes")
-        
+
         return when (obtenerOpcionUsuario(1, 4)) {
             1 -> crearPilotoElite(nombre, nacionalidad, 25)
             2 -> crearPilotoExcelente(nombre, nacionalidad, 24)
@@ -126,7 +138,7 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
             else -> crearPilotoBueno(nombre, nacionalidad, 23)
         }
     }
-    
+
     /**
      * Configura la dificultad de la partida
      */
@@ -138,7 +150,7 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         println("3. 🟠 Difícil (75) - Jugadores experimentados")
         println("4. 🔴 Élite (90) - Solo para expertos")
         println("5. 🎯 Personalizada - Elige tu nivel")
-        
+
         return when (obtenerOpcionUsuario(1, 5)) {
             1 -> 25
             2 -> 50
@@ -151,7 +163,7 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
             else -> 50
         }
     }
-    
+
     /**
      * Configura la duración de la temporada
      */
@@ -162,7 +174,7 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         println("2. 🏆 Normal (10 carreras) - Experiencia estándar")
         println("3. 🏅 Larga (15 carreras) - Para jugadores dedicados")
         println("4. 📊 Personalizada - Elige el número de carreras")
-        
+
         return when (obtenerOpcionUsuario(1, 4)) {
             1 -> 5
             2 -> 10
@@ -174,7 +186,7 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
             else -> 10
         }
     }
-    
+
     /**
      * Maneja el flujo de carga de partida
      */
@@ -184,12 +196,11 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         println("📂".repeat(25))
 
         print("Nombre de la partida a cargar: ")
-        val nombreArchivoInput = readln().trim().takeIf { it.isNotBlank() } ?: "partida_guardada"
-        val nombreArchivo = if (nombreArchivoInput.endsWith(".motojson")) nombreArchivoInput else "$nombreArchivoInput.motojson"
-        
+        val nombreArchivo = leerLinea().trim().takeIf { it.isNotBlank() } ?: "partida_guardada"
+
         println("\n⏳ Cargando partida...")
         val exito = gestorCarrera.cargarProgreso(nombreArchivo)
-        
+
         if (exito) {
             println("Partida cargada exitosamente!")
             menuPartidaEnCurso()
@@ -198,16 +209,16 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
             println("Asegúrate de que el archivo existe y es válido")
         }
     }
-    
+
     /**
      * Menú principal cuando hay una partida en curso
      */
     private fun menuPartidaEnCurso() {
         var enPartida = true
-        
+
         while (enPartida && gestorCarrera.temporadaEnCurso()) {
             mostrarMenuPartida()
-            
+
             when (obtenerOpcionUsuario(1, 6)) {
                 1 -> simularSiguienteCarrera()    // Opción 1: Simular carrera
                 2 -> mostrarEstadoActual()        // Opción 2: Ver estado
@@ -220,7 +231,7 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
                 }
             }
         }
-        
+
         // Si salimos porque terminó la temporada
         if (gestorCarrera.temporadaFinalizada()) {
             println("\n🏆 TEMPORADA FINALIZADA!")
@@ -228,14 +239,14 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
             println(resumen)
         }
     }
-    
+
     /**
      * Muestra el menú de partida en curso
      */
     private fun mostrarMenuPartida() {
         val progreso = gestorCarrera.obtenerProgresoTemporada()
         val proximaCarrera = gestorCarrera.obtenerProximaCarrera()
-        
+
         println("\n" + "🏁".repeat(25))
         println("     PARTIDA EN CURSO")
         println("🏁".repeat(25))
@@ -251,25 +262,25 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         println("🏁".repeat(25))
         print("Selecciona una opción (1-6): ")
     }
-    
+
     /**
      * Simula la siguiente carrera del calendario
      */
     private fun simularSiguienteCarrera() {
         println("\n⏳ Simulando carrera...")
         val resultado = gestorCarrera.simularSiguienteCarrera()
-        
+
         println("\n" + "🏁".repeat(40))
         println("         RESULTADO DE CARRERA")
         println("🏁".repeat(40))
         println(resultado.resumen())  // ← Muestra resultado claro y formateado
         println("🏁".repeat(40))
-        
+
         // Pausa para que el usuario pueda leer los resultados
         println("\n⏎ Presiona Enter para continuar...")
-        readln()
+        leerLinea()
     }
-    
+
     /**
      * Muestra el estado actual del jugador
      */
@@ -280,7 +291,7 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         println(gestorCarrera.obtenerEstadoJugador())
         println("📊".repeat(25))
     }
-    
+
     /**
      * Muestra la clasificación actual
      */
@@ -288,7 +299,7 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         println("\n" + "🏆".repeat(25))
         println("     CLASIFICACIÓN ACTUAL")
         println("🏆".repeat(25))
-        
+
         val clasificacion = gestorCarrera.obtenerClasificacionGeneral()
         if (clasificacion.isEmpty()) {
             println("No hay datos de clasificación disponibles")
@@ -298,7 +309,7 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
                 val (piloto, puntos) = entry
                 val emoji = when (posicion) {
                     1 -> "🥇"
-                    2 -> "🥈" 
+                    2 -> "🥈"
                     3 -> "🥉"
                     else -> "🔸"
                 }
@@ -307,15 +318,14 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         }
         println("🏆".repeat(25))
     }
-    
+
     /**
      * Guarda la partida actual
      */
     private fun guardarPartidaActual() {
         print("\n💾 Nombre para guardar la partida: ")
-        val nombreArchivoInput = readln().trim().takeIf { it.isNotBlank() } ?: "partida_guardada"
-        val nombreArchivo = if (nombreArchivoInput.endsWith(".motojson")) nombreArchivoInput else "$nombreArchivoInput.motojson"
-        
+        val nombreArchivo = leerLinea().trim().takeIf { it.isNotBlank() } ?: "partida_guardada"
+
         val exito = gestorCarrera.guardarProgreso(nombreArchivo)
         if (exito) {
             println("Partida guardada como '$nombreArchivo'")
@@ -323,7 +333,7 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
             println("Error al guardar la partida")
         }
     }
-    
+
     /**
      * Menú de gestión de equipo
      */
@@ -331,9 +341,9 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         println("\n🏍️ Gestión de equipo - En desarrollo")
         println("💡 Próximamente: fichajes, mejoras de moto, etc.")
         println("⏎ Presiona Enter para continuar...")
-        readln()
+        leerLinea()
     }
-    
+
     /**
      * Muestra los créditos del juego
      */
@@ -348,17 +358,18 @@ class InterfazUsuario(private val gestorCarrera: org.example.motogp.carrera.Gest
         println("💾 Persistencia: JSON con kotlinx.serialization")
         println("⭐".repeat(25))
         println("⏎ Presiona Enter para continuar...")
-        readln()
+        leerLinea()
     }
-    
+
     /**
      * Obtiene una opción válida del usuario
      */
     private fun obtenerOpcionUsuario(min: Int, max: Int): Int {
         while (true) {
             try {
-                val input = readln().toInt()
-                if (input in min..max) {
+                val inputLine = leerLinea().trim()
+                val input = inputLine.toIntOrNull()
+                if (input != null && input in min..max) {
                     return input
                 } else {
                     println("Por favor, introduce un número entre $min y $max: ")

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.motogp.AppTest" tests="29" skipped="0" failures="0" errors="0" timestamp="2025-12-05T14:09:00" hostname="etec-AB350M-DS3H-V2" time="0.16">
+  <properties/>
+  <testcase name="testSimuladorConMenosDe2Pilotos" classname="org.example.motogp.AppTest" time="0.043"/>
+  <testcase name="testFicharPiloto" classname="org.example.motogp.AppTest" time="0.009"/>
+  <testcase name="testSistemaPuntos" classname="org.example.motogp.AppTest" time="0.0"/>
+  <testcase name="testResultadoEsDiferenteCadaVez" classname="org.example.motogp.AppTest" time="0.003"/>
+  <testcase name="testCircuitoCreacion" classname="org.example.motogp.AppTest" time="0.001"/>
+  <testcase name="testModoCarreraManagerSimulacion" classname="org.example.motogp.AppTest" time="0.017"/>
+  <testcase name="testInterfazUsuarioCreacion" classname="org.example.motogp.AppTest" time="0.001"/>
+  <testcase name="testOpcionesMenuValidas" classname="org.example.motogp.AppTest" time="0.001"/>
+  <testcase name="testCreacionPilotoValido" classname="org.example.motogp.AppTest" time="0.0"/>
+  <testcase name="testEstadoTemporada" classname="org.example.motogp.AppTest" time="0.001"/>
+  <testcase name="testResultadoCarrera" classname="org.example.motogp.AppTest" time="0.0"/>
+  <testcase name="testValidacionRendimiento" classname="org.example.motogp.AppTest" time="0.0"/>
+  <testcase name="testModoCarreraManagerEstado" classname="org.example.motogp.AppTest" time="0.025"/>
+  <testcase name="testSimuladorConPesosPersonalizados" classname="org.example.motogp.AppTest" time="0.0"/>
+  <testcase name="testModoCarreraManagerInicializacion" classname="org.example.motogp.AppTest" time="0.001"/>
+  <testcase name="testObtenerRendimientoMedio" classname="org.example.motogp.AppTest" time="0.001"/>
+  <testcase name="testSimuladorCarreraSimple" classname="org.example.motogp.AppTest" time="0.0"/>
+  <testcase name="testGuardadoYCargaManager" classname="org.example.motogp.AppTest" time="0.042"/>
+  <testcase name="testInterfazGestionModoCarrera" classname="org.example.motogp.AppTest" time="0.0"/>
+  <testcase name="testSerializacionEstadoTemporada" classname="org.example.motogp.AppTest" time="0.001"/>
+  <testcase name="testPuntajeTotalRendimiento" classname="org.example.motogp.AppTest" time="0.0"/>
+  <testcase name="testFicharPilotoEquipoCompleto" classname="org.example.motogp.AppTest" time="0.004"/>
+  <testcase name="testCreacionEquipo" classname="org.example.motogp.AppTest" time="0.0"/>
+  <testcase name="testEquipoSinPilotos" classname="org.example.motogp.AppTest" time="0.001"/>
+  <testcase name="testValidacionEdadMinima" classname="org.example.motogp.AppTest" time="0.0"/>
+  <testcase name="testDarDeBajaPiloto" classname="org.example.motogp.AppTest" time="0.0"/>
+  <testcase name="testInterfazSimulador" classname="org.example.motogp.AppTest" time="0.001"/>
+  <testcase name="testCreacionMotoValida" classname="org.example.motogp.AppTest" time="0.0"/>
+  <testcase name="testModoCarreraManagerMultiplesCarreras" classname="org.example.motogp.AppTest" time="0.002"/>
+  <system-out><![CDATA[]]>&#x1f4c5;<![CDATA[ Temporada configurada con 5 carreras
+✅ Nueva temporada iniciada con 5 carreras
+]]>&#x1f3af;<![CDATA[ Piloto: Jugador Test
+⚡ Dificultad: 50
+
+]]>&#x1f3c1;<![CDATA[ Simulando carrera 1/5
+]]>&#x1f4cd;<![CDATA[ Circuito: Circuito de Jerez-Ángel Nieto
+✅ Carrera simulada - Ganador: Marc Márquez
+]]>&#x1f4c5;<![CDATA[ Temporada configurada con 5 carreras
+✅ Nueva temporada iniciada con 5 carreras
+]]>&#x1f3af;<![CDATA[ Piloto: Jugador Test
+⚡ Dificultad: 75
+]]>&#x1f4c5;<![CDATA[ Temporada configurada con 5 carreras
+✅ Nueva temporada iniciada con 5 carreras
+]]>&#x1f3af;<![CDATA[ Piloto: Jugador Test
+⚡ Dificultad: 75
+]]>&#x1f4c5;<![CDATA[ Temporada configurada con 5 carreras
+✅ Nueva temporada iniciada con 5 carreras
+]]>&#x1f3af;<![CDATA[ Piloto: Jugador Guardado
+⚡ Dificultad: 60
+
+]]>&#x1f3c1;<![CDATA[ Simulando carrera 1/5
+]]>&#x1f4cd;<![CDATA[ Circuito: TT Circuit Assen
+✅ Carrera simulada - Ganador: Enea Bastianini
+✅ Guardado en test_partida.motojson
+✅ Partida cargada correctamente desde: test_partida.motojson
+]]>&#x1f4c5;<![CDATA[ Temporada configurada con 3 carreras
+✅ Nueva temporada iniciada con 3 carreras
+]]>&#x1f3af;<![CDATA[ Piloto: Jugador Test
+⚡ Dificultad: 50
+
+]]>&#x1f3c1;<![CDATA[ Simulando carrera 1/3
+]]>&#x1f4cd;<![CDATA[ Circuito: Mugello Circuit
+✅ Carrera simulada - Ganador: Francesco Bagnaia
+
+]]>&#x1f3c1;<![CDATA[ Simulando carrera 2/3
+]]>&#x1f4cd;<![CDATA[ Circuito: Mugello Circuit
+✅ Carrera simulada - Ganador: Jugador Test
+
+]]>&#x1f3c1;<![CDATA[ Simulando carrera 3/3
+]]>&#x1f4cd;<![CDATA[ Circuito: Mugello Circuit
+✅ Carrera simulada - Ganador: Marc Márquez
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

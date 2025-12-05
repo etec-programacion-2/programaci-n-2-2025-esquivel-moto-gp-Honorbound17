@@ -14,6 +14,8 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+    testImplementation(kotlin("test"))
 }
 
 kotlin {
@@ -22,4 +24,8 @@ kotlin {
 
 application {
     mainClass.set("org.example.motogp.MainKt")
+}
+
+tasks.withType<org.gradle.api.tasks.JavaExec> {
+    standardInput = System.`in`
 }

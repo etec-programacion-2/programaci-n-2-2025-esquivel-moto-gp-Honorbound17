@@ -1,6 +1,7 @@
 package org.example.motogp.models
 
 import org.example.motogp.enums.FabricanteMoto
+import org.example.motogp.format
 /**
  * Clase que representa un equipo de MotoGP.
  * @property nombre Nombre del equipo
